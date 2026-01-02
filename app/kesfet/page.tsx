@@ -137,20 +137,18 @@ export default function Home() {
       <div className="fixed top-0 left-0 w-full z-50 p-4 flex justify-center pointer-events-none">
         <div className="w-full max-w-xl flex flex-col items-center gap-2">
           <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
-            {/* LOGO -> ANA SAYFA */}
-            <Link href="/" className="flex flex-col pl-3 active:scale-95 group transition-transform">
-              <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 transition-colors tracking-tighter">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
+            
+            <Link href="/" className="flex flex-col pl-3 active:scale-95 group">
+              <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 transition-colors">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
               <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
             </Link>
             
             <div className="flex items-center gap-2">
-              {/* PUAN BUTONU -> PROFİL SAYFASI */}
-              <Link href="/profil" className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 hover:bg-white/10 transition-all active:scale-95 flex items-center gap-2">
-                <span className="text-white font-black italic text-[10px]">🏆 {toplamPuan} CP</span>
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+              <Link href="/profil" className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 hover:bg-white/20 transition-all active:scale-95 text-white font-black italic text-[10px]">
+                🏆 {toplamPuan} CP
               </Link>
 
-              <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 text-red-500 active:scale-90 transition-all hover:bg-red-500/20">
+              <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 text-red-500 active:scale-90 transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
               </button>
             </div>
@@ -167,8 +165,12 @@ export default function Home() {
           <img src={foto.foto_url} className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-20" alt="" />
           <div className="relative w-full h-full flex items-center justify-center p-4 pt-24">
             <img src={foto.foto_url} onDoubleClick={() => oylamaAc(index)} className="max-h-[75vh] w-auto max-w-[95%] rounded-[3rem] shadow-2xl border-[6px] border-white/5 object-contain" alt="Pet" />
+            
             <div className="absolute right-4 bottom-24 flex flex-col items-center gap-6">
-              <button onClick={() => paylas(foto.foto_url)} className="p-4 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white active:scale-90 shadow-xl transition-all"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0-10.628a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zm0 10.628a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" /></svg></button>
+              <button onClick={() => paylas(foto.foto_url)} className="p-4 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white active:scale-90 shadow-xl transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0-10.628a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zm0 10.628a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" /></svg>
+              </button>
+              
               <div className="flex flex-col items-center gap-2">
                 <button onClick={() => oylamaAc(index)} className={`p-5 rounded-full shadow-2xl transition-all duration-300 active:scale-90 ${foto.liked ? 'bg-green-600 scale-110' : 'bg-white/10 backdrop-blur-md border border-white/20'}`}>
                   <span className="text-3xl">{foto.liked ? '✅' : '⭐'}</span>
@@ -185,20 +187,26 @@ export default function Home() {
       {oylamaPaneli.open && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl">
+            
             <h3 className="text-white text-center font-black italic uppercase text-lg mb-6 tracking-tighter">Puan Ver</h3>
+            
             <div className="flex justify-between mb-8 px-2">
               {[1, 2, 3, 4, 5].map((p) => (
                 <button 
                   key={p} 
+                  type="button"
                   onClick={() => setSecilenPuan(p)}
-                  className={`w-12 h-12 rounded-2xl font-black text-xl flex items-center justify-center transition-all active:scale-90 ${secilenPuan === p ? 'bg-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.5)] scale-110 border-transparent' : 'bg-white/5 border border-white/10 text-white/40 hover:bg-white/10'}`}
+                  className={`w-12 h-12 rounded-2xl font-black text-xl flex items-center justify-center transition-all active:scale-90 border-2 ${secilenPuan === p ? 'bg-amber-500 text-black border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)] scale-110' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
                 >
                   {p}
                 </button>
               ))}
             </div>
+
             <div className="h-px bg-white/10 w-full mb-8"></div>
+            
             <h3 className="text-white text-center font-black italic uppercase text-lg mb-6 tracking-tighter">Sence Nasıl?</h3>
+
             <div className="grid grid-cols-1 gap-3">
               {[
                 { label: '😎 Karizmatik', id: 'karizmatik' },
@@ -209,15 +217,17 @@ export default function Home() {
               ].map((obj) => (
                 <button 
                   key={obj.id} 
+                  type="button"
                   onClick={() => oyVer(obj.id)}
                   disabled={secilenPuan === null}
-                  className={`w-full py-4 rounded-2xl border font-bold text-sm flex items-center justify-center gap-3 transition-all active:scale-95 ${secilenPuan === null ? 'bg-white/5 border-white/5 text-white/20 cursor-not-allowed' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
+                  className={`w-full py-4 rounded-2xl border font-bold text-sm flex items-center justify-center gap-3 transition-all active:scale-95 ${secilenPuan === null ? 'bg-white/5 border-white/5 text-white/10 cursor-not-allowed' : 'bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20'}`}
                 >
                   {obj.label}
                 </button>
               ))}
             </div>
-            <button onClick={() => setOylamaPaneli({ open: false, index: null })} className="w-full mt-6 text-white/20 font-bold text-[10px] uppercase tracking-widest hover:text-white transition-colors">Vazgeç</button>
+
+            <button type="button" onClick={() => setOylamaPaneli({ open: false, index: null })} className="w-full mt-6 text-white/20 font-bold text-[10px] uppercase tracking-widest hover:text-white transition-colors">Vazgeç</button>
           </div>
         </div>
       )}
