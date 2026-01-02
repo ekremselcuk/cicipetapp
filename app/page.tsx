@@ -24,6 +24,12 @@ export default function Home() {
     checkUser();
   }, []);
 
+  // ÇIKIŞ FONKSİYONU GÜNCELLENDİ
+  const cikisYap = async () => {
+    await supabase.auth.signOut();
+    window.location.reload(); // Sayfayı yeniler ve login ekranına atar
+  };
+
   const oyVer = async () => {
     if (oyHakki > 0 && user) {
       const yeniPuan = puan + 1;
@@ -62,7 +68,17 @@ export default function Home() {
           <div className="bg-amber-100 px-3 py-1 rounded-full">
             <span className="text-[10px] font-black text-amber-600 tracking-widest uppercase">CiciPet - Oyla Kazan</span>
           </div>
-          <button onClick={() => supabase.auth.signOut()} className="text-[10px] font-bold text-red-400 hover:text-red-600 transition-colors uppercase tracking-wider">Çıkış Yap</button>
+          
+          {/* YENİ ŞIK ÇIKIŞ BUTONU */}
+          <button 
+            onClick={cikisYap} 
+            className="flex items-center gap-1 px-3 py-1 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200"
+          >
+            <span className="text-[10px] font-bold uppercase tracking-wider">Çıkış</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="Status-logout 17l-5-5m0 0l5-5m-5 5h12" />
+            </svg>
+          </button>
         </div>
 
         <div className="mb-2 text-gray-400 font-bold text-xs uppercase tracking-widest">Toplam CiciPuan</div>
