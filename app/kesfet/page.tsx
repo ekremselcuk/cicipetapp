@@ -2,17 +2,18 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import Login from './login';
 
-export default function Kesfet() {
+export default function Home() {
   const [fotolar, setFotolar] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [oyHakki, setOyHakki] = useState(0);
   const [toplamPuan, setToplamPuan] = useState(0);
-  const [user, setUser] = useState<any>(null);
   const observer = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    const baslat = async () => {
+    const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
@@ -21,10 +22,10 @@ export default function Kesfet() {
           setOyHakki(data.oy_hakki || 0);
           setToplamPuan(data.toplam_puan || 0);
         }
+        kediGetir();
       }
     };
-    baslat();
-    kediGetir();
+    checkUser();
   }, []);
 
   const kediGetir = async () => {
@@ -66,64 +67,75 @@ export default function Kesfet() {
       return kopya;
     });
 
-    await supabase.from('profil').update({ 
-      oy_hakki: yeniHak, 
-      toplam_puan: yeniPuan 
-    }).eq('id', user.id);
+    await supabase.from('profil').update({ oy_hakki: yeniHak, toplam_puan: yeniPuan }).eq('id', user.id);
   };
 
+  const cikisYap = async () => {
+    await supabase.auth.signOut();
+    window.location.reload();
+  };
+
+  if (!user) return <main className="h-screen flex items-center justify-center bg-black"><Login /></main>;
+
   return (
-    <main className="h-screen w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide">
-      {/* Üst Sabit Bar */}
-      <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center p-4 bg-gradient-to-b from-black/60 to-transparent">
-        <div className="text-white">
-          <h1 className="text-xl font-black italic uppercase tracking-tighter">Keşfet</h1>
-          <div className="flex gap-3 text-[10px] font-bold text-amber-400 uppercase italic">
-            <span>⚡ {oyHakki}</span>
-            <span>🏆 {toplamPuan}</span>
+    <main className="h-screen w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide select-none">
+      
+      {/* ÜST BAR (Şeffaf & Tasarıma Uyumlu) */}
+      <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center p-6 bg-gradient-to-b from-black/80 to-transparent">
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">CiciPet</h1>
+          <div className="flex gap-3 mt-1 font-bold text-[10px] text-amber-400 uppercase italic">
+            <span>⚡ {oyHakki} Enerji</span>
+            <span>🏆 {toplamPuan} CP</span>
           </div>
         </div>
-        <Link href="/" className="bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-black uppercase italic border border-white/30">Geri</Link>
+        <div className="flex gap-2">
+          <Link href="/profil" className="bg-white/10 backdrop-blur-xl border border-white/20 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase italic hover:bg-white/20 transition-all">Profil 👤</Link>
+          <button onClick={cikisYap} className="bg-red-500/20 backdrop-blur-xl border border-red-500/30 text-red-500 px-5 py-2 rounded-full text-[10px] font-black uppercase italic">Çıkış</button>
+        </div>
       </div>
 
-      {/* Sonsuz Akış */}
+      {/* SONSUZ AKIŞ */}
       {fotolar.map((foto, index) => (
         <section 
           key={foto.id + index} 
           ref={fotolar.length === index + 1 ? sonElemanRef : null}
           className="h-screen w-full relative flex items-center justify-center snap-start bg-zinc-900"
         >
-          {/* Arkaplan Bulanık Resim (Görsellik için) */}
-          <img src={foto.foto_url} className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30" />
+          {/* Arkaplan Blur */}
+          <img src={foto.foto_url} className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-20" alt="" />
           
-          {/* Ana Kedi Resmi */}
           <div className="relative w-full h-full flex items-center justify-center p-4">
             <img 
               src={foto.foto_url} 
-              className="max-h-[85vh] w-auto max-w-full rounded-[3rem] shadow-2xl border-4 border-white/10 object-contain"
               onDoubleClick={() => begeniAt(index)}
+              className="max-h-[80vh] w-auto max-w-[95%] rounded-[3rem] shadow-2xl border-[6px] border-white/5 object-contain"
+              alt="Pet"
             />
 
-            {/* Sağ Taraftaki İşlem Butonu */}
-            <div className="absolute right-6 bottom-32 flex flex-col items-center gap-6">
+            {/* OY VER BUTONU (Yeni İşlevsel Tasarım) */}
+            <div className="absolute right-4 bottom-24 flex flex-col items-center">
               <button 
                 onClick={() => begeniAt(index)}
-                className={`p-5 rounded-full shadow-2xl transition-all active:scale-90 ${foto.liked ? 'bg-red-500 scale-110' : 'bg-white/10 backdrop-blur-md border border-white/20'}`}
+                className={`group flex flex-col items-center gap-2 p-2 rounded-full transition-all active:scale-90`}
               >
-                <span className={`text-3xl ${foto.liked ? 'animate-ping absolute opacity-75' : ''}`}>❤️</span>
-                <span className="text-3xl relative z-10">❤️</span>
+                <div className={`p-5 rounded-full shadow-2xl transition-all duration-300 ${foto.liked ? 'bg-red-600 scale-110' : 'bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20'}`}>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill={foto.liked ? "white" : "none"} viewBox="0 0 24 24" strokeWidth={2.5} stroke={foto.liked ? "white" : "white"} className="w-8 h-8">
+                    <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                  </svg>
+                </div>
+                <span className={`text-[10px] font-black uppercase italic tracking-widest drop-shadow-md ${foto.liked ? 'text-red-500' : 'text-white'}`}>
+                  {foto.liked ? 'Oylandı' : 'Oy Ver'}
+                </span>
               </button>
-              <span className="text-white text-[10px] font-black uppercase italic tracking-widest drop-shadow-md">
-                {foto.liked ? 'Oylandı' : 'Oy Ver'}
-              </span>
             </div>
           </div>
         </section>
       ))}
 
       {loading && (
-        <div className="h-screen w-full flex items-center justify-center bg-black">
-          <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
+          <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
         </div>
       )}
     </main>
