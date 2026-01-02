@@ -3,14 +3,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import Turnstile from 'react-turnstile';
-// Eğer hata alırsan './login' yerine '@/app/login' dene
 import Login from './login';
 
 export default function Home() {
   const [fotolar, setFotolar] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [oyHakki, setOyHakki] = useState(0);
+  const [oyHakki, setOyHakki] = useState<number | null>(null); // Refresh hatası için null başlattık
   const [toplamPuan, setToplamPuan] = useState(0);
   const [reklamModu, setReklamModu] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -33,13 +32,15 @@ export default function Home() {
     if (session?.user) {
       setUser(session.user);
       fetchUserData(session.user.id);
+    } else {
+      setOyHakki(0); // Kullanıcı yoksa 0 set et
     }
   };
 
   const fetchUserData = async (userId: string) => {
     const { data } = await supabase.from('profil').select('oy_hakki, toplam_puan').eq('id', userId).single();
     if (data) {
-      setOyHakki(data.oy_hakki || 0);
+      setOyHakki(data.oy_hakki); // Veritabanındaki gerçek değeri direkt basıyoruz
       setToplamPuan(data.toplam_puan || 0);
     }
   };
@@ -79,14 +80,14 @@ export default function Home() {
       setShowLoginModal(true);
       return;
     }
-    if (oyHakki <= 0) { setReklamModu(true); return; }
+    if (oyHakki !== null && oyHakki <= 0) { setReklamModu(true); return; }
     if (fotolar[index].liked) return;
     setSecilenPuan(null); 
     setOylamaPaneli({ open: true, index });
   };
 
   const oyVer = async (etiket: string) => {
-    if (secilenPuan === null || !user) return;
+    if (secilenPuan === null || !user || oyHakki === null) return;
     const index = oylamaPaneli.index;
     if (index === null) return;
 
@@ -141,7 +142,8 @@ export default function Home() {
         <div className="w-full max-w-xl flex flex-col items-center gap-2">
           <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
             
-            <Link href="/" className="flex flex-col pl-3 active:scale-95 group transition-transform">
+            {/* LOGO DÜZELTME: Hem Link hem onClick ile kesin çözüm */}
+            <Link href="/" onClick={() => window.location.href='/'} className="flex flex-col pl-3 active:scale-95 group transition-transform">
               <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 tracking-tighter transition-colors">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
               <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
             </Link>
@@ -161,7 +163,8 @@ export default function Home() {
               )}
             </div>
           </div>
-          {user && (
+          {/* ENERJİ BAR DÜZELTME: oyHakki null değilse göster (Refresh koruması) */}
+          {user && oyHakki !== null && (
             <div className="bg-amber-500 px-6 py-1 rounded-full shadow-lg text-[10px] font-black italic text-black uppercase pointer-events-auto border border-amber-600 animate-pulse">
               ⚡ {oyHakki} ENERJİ
             </div>
