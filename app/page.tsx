@@ -118,9 +118,18 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center p-4 bg-gradient-to-b from-amber-50 to-orange-100 font-sans pb-20">
       
       <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl text-center border-8 border-white w-full max-w-sm relative overflow-hidden mb-8 mt-4">
-        <div className="flex justify-between items-center mb-6">
-          <Link href="/profil" className="text-[10px] font-black text-amber-600 bg-amber-100 px-4 py-2 rounded-full uppercase tracking-widest italic hover:bg-amber-200 transition-all">Profilim 👤</Link>
-          <button onClick={cikisYap} className="text-[10px] font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg uppercase hover:bg-red-100 transition-all">Çıkış</button>
+        
+        {/* YENİ BUTON ALANI */}
+        <div className="flex justify-between items-center mb-6 gap-2">
+          <Link href="/kesfet" className="flex-1 text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-2 rounded-xl uppercase text-center border-2 border-white shadow-sm italic hover:bg-blue-100 transition-all">
+            Keşfet 🌍
+          </Link>
+          <Link href="/profil" className="flex-1 text-[10px] font-black text-amber-600 bg-amber-100 px-3 py-2 rounded-xl uppercase text-center border-2 border-white shadow-sm italic hover:bg-amber-100 transition-all">
+            Profil 👤
+          </Link>
+          <button onClick={cikisYap} className="text-[10px] font-bold text-red-500 bg-red-50 px-3 py-2 rounded-xl uppercase border-2 border-white shadow-sm hover:bg-red-100 transition-all">
+            Çıkış
+          </button>
         </div>
 
         <div className="mb-1 text-gray-400 font-bold text-xs uppercase tracking-widest">Puanın</div>
