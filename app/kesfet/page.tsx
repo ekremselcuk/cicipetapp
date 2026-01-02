@@ -80,10 +80,7 @@ export default function Home() {
   };
 
   const oyVer = async (etiket: string) => {
-    if (secilenPuan === null) {
-      alert("Önce bir puan seçmelisin! 🐾");
-      return;
-    }
+    if (secilenPuan === null) return;
     const index = oylamaPaneli.index;
     if (index === null || !user) return;
 
@@ -140,15 +137,20 @@ export default function Home() {
       <div className="fixed top-0 left-0 w-full z-50 p-4 flex justify-center pointer-events-none">
         <div className="w-full max-w-xl flex flex-col items-center gap-2">
           <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
-            <a href="/" className="flex flex-col pl-3 active:scale-95 group transition-transform">
+            {/* LOGO -> ANA SAYFA */}
+            <Link href="/" className="flex flex-col pl-3 active:scale-95 group transition-transform">
               <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 transition-colors tracking-tighter">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
               <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
-            </a>
+            </Link>
+            
             <div className="flex items-center gap-2">
-              <div className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10">
+              {/* PUAN BUTONU -> PROFİL SAYFASI */}
+              <Link href="/profil" className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 hover:bg-white/10 transition-all active:scale-95 flex items-center gap-2">
                 <span className="text-white font-black italic text-[10px]">🏆 {toplamPuan} CP</span>
-              </div>
-              <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 text-red-500 active:scale-90 transition-all">
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+              </Link>
+
+              <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 text-red-500 active:scale-90 transition-all hover:bg-red-500/20">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
               </button>
             </div>
@@ -179,13 +181,11 @@ export default function Home() {
         </section>
       ))}
 
-      {/* MANİPÜLASYONSUZ OYLAMA PANELİ */}
+      {/* OYLAMA PANELİ */}
       {oylamaPaneli.open && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl">
-            
             <h3 className="text-white text-center font-black italic uppercase text-lg mb-6 tracking-tighter">Puan Ver</h3>
-            
             <div className="flex justify-between mb-8 px-2">
               {[1, 2, 3, 4, 5].map((p) => (
                 <button 
@@ -197,11 +197,8 @@ export default function Home() {
                 </button>
               ))}
             </div>
-
             <div className="h-px bg-white/10 w-full mb-8"></div>
-            
             <h3 className="text-white text-center font-black italic uppercase text-lg mb-6 tracking-tighter">Sence Nasıl?</h3>
-
             <div className="grid grid-cols-1 gap-3">
               {[
                 { label: '😎 Karizmatik', id: 'karizmatik' },
@@ -213,13 +210,13 @@ export default function Home() {
                 <button 
                   key={obj.id} 
                   onClick={() => oyVer(obj.id)}
+                  disabled={secilenPuan === null}
                   className={`w-full py-4 rounded-2xl border font-bold text-sm flex items-center justify-center gap-3 transition-all active:scale-95 ${secilenPuan === null ? 'bg-white/5 border-white/5 text-white/20 cursor-not-allowed' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
                 >
                   {obj.label}
                 </button>
               ))}
             </div>
-
             <button onClick={() => setOylamaPaneli({ open: false, index: null })} className="w-full mt-6 text-white/20 font-bold text-[10px] uppercase tracking-widest hover:text-white transition-colors">Vazgeç</button>
           </div>
         </div>
