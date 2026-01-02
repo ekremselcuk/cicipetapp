@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import Turnstile from 'react-turnstile';
-import Login from './login';
+import Login from './login'; // Login bileşenini modal içinde kullanacağız
 
 export default function Home() {
   const [fotolar, setFotolar] = useState<any[]>([]);
@@ -17,6 +17,7 @@ export default function Home() {
   
   const [oylamaPaneli, setOylamaPaneli] = useState<{ open: boolean, index: number | null }>({ open: false, index: null });
   const [secilenPuan, setSecilenPuan] = useState<number | null>(null); 
+  const [showLoginModal, setShowLoginModal] = useState(false); // Giriş yapmayanlar için modal
 
   const observer = useRef<IntersectionObserver | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -27,8 +28,8 @@ export default function Home() {
       if (session?.user) {
         setUser(session.user);
         fetchUserData(session.user.id);
-        kediGetir();
       }
+      kediGetir(); // Kullanıcı olsa da olmasa da kediler gelsin
     };
     checkUser();
   }, []);
@@ -73,6 +74,10 @@ export default function Home() {
   };
 
   const oylamaAc = (index: number) => {
+    if (!user) {
+      setShowLoginModal(true); // Giriş yoksa login modalını aç
+      return;
+    }
     if (oyHakki <= 0) { setReklamModu(true); return; }
     if (fotolar[index].liked) return;
     setSecilenPuan(null); 
@@ -80,9 +85,9 @@ export default function Home() {
   };
 
   const oyVer = async (etiket: string) => {
-    if (secilenPuan === null) return;
+    if (secilenPuan === null || !user) return;
     const index = oylamaPaneli.index;
-    if (index === null || !user) return;
+    if (index === null) return;
 
     const yeniHak = oyHakki - 1;
     const yeniPuan = toplamPuan + secilenPuan;
@@ -97,7 +102,6 @@ export default function Home() {
 
     setOylamaPaneli({ open: false, index: null });
     await supabase.from('profil').update({ oy_hakki: yeniHak, toplam_puan: yeniPuan }).eq('id', user.id);
-    
     setTimeout(sonrakiPet, 500);
   };
 
@@ -116,19 +120,17 @@ export default function Home() {
   };
 
   const enerjiTazele = async () => {
-    if (!captchaToken) return;
+    if (!captchaToken || !user) return;
     setReklamIzleniyor(true);
     setTimeout(async () => {
       const fullHak = 5;
       setOyHakki(fullHak);
-      if (user) await supabase.from('profil').update({ oy_hakki: fullHak }).eq('id', user.id);
+      await supabase.from('profil').update({ oy_hakki: fullHak }).eq('id', user.id);
       setReklamIzleniyor(false);
       setReklamModu(false);
       setCaptchaToken(null);
     }, 2000);
   };
-
-  if (!user) return <main className="h-screen flex items-center justify-center bg-black"><Login /></main>;
 
   return (
     <main ref={scrollContainerRef} className="h-screen w-full bg-black overflow-y-scroll snap-y snap-stop snap-mandatory scrollbar-hide select-none">
@@ -139,23 +141,30 @@ export default function Home() {
           <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
             
             <Link href="/" className="flex flex-col pl-3 active:scale-95 group">
-              <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 transition-colors">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
-              <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
+              <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 transition-colors tracking-tighter">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
+              <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic text-center">En Tatlı Yarışma 🏆</p>
             </Link>
             
             <div className="flex items-center gap-2">
-              <Link href="/profil" className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 hover:bg-white/20 transition-all active:scale-95 text-white font-black italic text-[10px]">
+              <button 
+                onClick={() => user ? window.location.href='/profil' : setShowLoginModal(true)} 
+                className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 hover:bg-white/20 transition-all active:scale-95 text-white font-black italic text-[10px]"
+              >
                 🏆 {toplamPuan} CP
-              </Link>
-
-              <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 text-red-500 active:scale-90 transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
               </button>
+
+              {user && (
+                <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 text-red-500 active:scale-90 transition-all hover:bg-red-500/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                </button>
+              )}
             </div>
           </div>
-          <div className="bg-amber-500 px-6 py-1 rounded-full shadow-lg text-[10px] font-black italic text-black uppercase pointer-events-auto border border-amber-600 animate-pulse">
-            ⚡ {oyHakki} ENERJİ
-          </div>
+          {user && (
+            <div className="bg-amber-500 px-6 py-1 rounded-full shadow-lg text-[10px] font-black italic text-black uppercase pointer-events-auto border border-amber-600 animate-pulse">
+              ⚡ {oyHakki} ENERJİ
+            </div>
+          )}
         </div>
       </div>
 
@@ -183,51 +192,38 @@ export default function Home() {
         </section>
       ))}
 
+      {/* GİRİŞ MODALI (YENİ) */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in duration-300">
+          <div className="w-full max-w-sm relative">
+            <button onClick={() => setShowLoginModal(false)} className="absolute -top-12 right-0 text-white/50 hover:text-white font-bold">Kapat</button>
+            <Login /> {/* Google ile Giriş Butonu Buradan Gelecek */}
+          </div>
+        </div>
+      )}
+
       {/* OYLAMA PANELİ */}
       {oylamaPaneli.open && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl">
-            
             <h3 className="text-white text-center font-black italic uppercase text-lg mb-6 tracking-tighter">Puan Ver</h3>
-            
             <div className="flex justify-between mb-8 px-2">
               {[1, 2, 3, 4, 5].map((p) => (
-                <button 
-                  key={p} 
-                  type="button"
-                  onClick={() => setSecilenPuan(p)}
-                  className={`w-12 h-12 rounded-2xl font-black text-xl flex items-center justify-center transition-all active:scale-90 border-2 ${secilenPuan === p ? 'bg-amber-500 text-black border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)] scale-110' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}
-                >
+                <button key={p} onClick={() => setSecilenPuan(p)} className={`w-12 h-12 rounded-2xl font-black text-xl flex items-center justify-center transition-all active:scale-90 border-2 ${secilenPuan === p ? 'bg-amber-500 text-black border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)] scale-110' : 'bg-white/5 border-white/10 text-white/40'}`}>
                   {p}
                 </button>
               ))}
             </div>
-
             <div className="h-px bg-white/10 w-full mb-8"></div>
-            
             <h3 className="text-white text-center font-black italic uppercase text-lg mb-6 tracking-tighter">Sence Nasıl?</h3>
-
             <div className="grid grid-cols-1 gap-3">
-              {[
-                { label: '😎 Karizmatik', id: 'karizmatik' },
-                { label: '🥰 Çok Tatlı', id: 'tatli' },
-                { label: '🎀 Çok Güzel', id: 'guzel' },
-                { label: '🤪 Çok Komik', id: 'komik' },
-                { label: '👹 Çirkin ama Tatlı', id: 'cirkin' }
-              ].map((obj) => (
-                <button 
-                  key={obj.id} 
-                  type="button"
-                  onClick={() => oyVer(obj.id)}
-                  disabled={secilenPuan === null}
-                  className={`w-full py-4 rounded-2xl border font-bold text-sm flex items-center justify-center gap-3 transition-all active:scale-95 ${secilenPuan === null ? 'bg-white/5 border-white/5 text-white/10 cursor-not-allowed' : 'bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20'}`}
-                >
-                  {obj.label}
+              {['😎 Karizmatik', '🥰 Çok Tatlı', '🎀 Çok Güzel', '🤪 Çok Komik', '👹 Çirkin ama Tatlı'].map((label, i) => (
+                <button key={i} onClick={() => oyVer(label)} disabled={secilenPuan === null} className={`w-full py-4 rounded-2xl border font-bold text-sm flex items-center justify-center gap-3 transition-all active:scale-95 ${secilenPuan === null ? 'bg-white/5 border-white/5 text-white/10 cursor-not-allowed' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}>
+                  {label}
                 </button>
               ))}
             </div>
-
-            <button type="button" onClick={() => setOylamaPaneli({ open: false, index: null })} className="w-full mt-6 text-white/20 font-bold text-[10px] uppercase tracking-widest hover:text-white transition-colors">Vazgeç</button>
+            <button onClick={() => setOylamaPaneli({ open: false, index: null })} className="w-full mt-6 text-white/20 font-bold text-[10px] uppercase tracking-widest">Vazgeç</button>
           </div>
         </div>
       )}
