@@ -83,7 +83,6 @@ export default function Home() {
 
     await supabase.from('profil').update({ oy_hakki: yeniHak, toplam_puan: yeniPuan }).eq('id', user.id);
 
-    // OTOMATİK SONRAKİ PETE GEÇİŞ (700ms sonra)
     setTimeout(() => {
       if (scrollContainerRef.current) {
         scrollContainerRef.current.scrollBy({
@@ -115,7 +114,7 @@ export default function Home() {
       className="h-screen w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide select-none"
     >
       
-      {/* ÜST BAR (YENİ LOGO & SLOGAN) */}
+      {/* ÜST BAR */}
       <div className="fixed top-0 left-0 w-full z-40 flex justify-between items-center p-6 bg-gradient-to-b from-black/80 to-transparent">
         <div className="flex flex-col">
           <h1 className="text-3xl font-black text-white tracking-tighter leading-none">
@@ -146,8 +145,15 @@ export default function Home() {
               alt="Pet" 
             />
 
-            {/* OY VER BUTONU */}
-            <div className="absolute right-4 bottom-24">
+            {/* YÖNLENDİRME VE OY BUTONU ALANI */}
+            <div className="absolute right-4 bottom-24 flex items-end gap-4">
+              {/* Sol Taraf Metinler */}
+              <div className="flex flex-col items-end mb-2 drop-shadow-lg">
+                <span className="text-white font-black italic text-sm uppercase tracking-tighter">Beğendin mi?</span>
+                <span className="text-white/50 font-bold italic text-[9px] uppercase tracking-widest">Kaydır ve Keşfet 🐾</span>
+              </div>
+
+              {/* Sağ Taraf Buton */}
               <button onClick={() => begeniAt(index)} className="group flex flex-col items-center gap-2">
                 <div className={`p-5 rounded-full shadow-2xl transition-all duration-300 ${foto.liked ? 'bg-red-600 scale-110' : oyHakki === 0 ? 'bg-amber-500 animate-bounce' : 'bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20'}`}>
                   {oyHakki > 0 ? (
@@ -171,7 +177,7 @@ export default function Home() {
           <div className="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center shadow-2xl relative">
             <button onClick={() => setReklamModu(false)} className="absolute top-4 right-6 text-gray-400 font-bold text-xl">×</button>
             <h2 className="text-2xl font-black text-amber-600 uppercase italic mb-2">Enerji Bitti!</h2>
-            <p className="text-gray-500 text-[10px] font-bold uppercase mb-6">Robot olmadığını kanıtla ve devam et</p>
+            <p className="text-gray-500 text-[10px] font-bold uppercase mb-6">Devam etmek için robot olmadığını kanıtla</p>
             
             {reklamIzleniyor ? (
               <div className="py-10 flex flex-col items-center gap-4">
