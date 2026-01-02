@@ -116,42 +116,46 @@ export default function Home() {
       className="h-screen w-full bg-black overflow-y-scroll snap-y snap-stop snap-mandatory scrollbar-hide select-none"
     >
       
-      {/* ÜST BAR VE ENERJİ SAYACI */}
-      <div className="fixed top-0 left-0 w-full z-50 p-4 flex flex-col items-center pointer-events-none">
-        <div className="w-full max-w-xl flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl relative z-20 pointer-events-auto">
+      {/* ÜST BAR VE ENERJİ SAYACI (FIXED DÜZEN) */}
+      <div className="fixed top-0 left-0 w-full z-50 p-4 flex justify-center pointer-events-none">
+        <div className="w-full max-w-xl flex flex-col items-center gap-2">
           
-          {/* TIKLANABİLİR LOGO SECTION */}
-          <a href="/" className="flex flex-col pl-3 active:scale-95 transition-transform cursor-pointer group">
-            <h1 className="text-xl font-black text-white tracking-tighter leading-none italic group-hover:text-amber-500 transition-colors">
-              Cici<span className="text-amber-500 group-hover:text-white">Pet</span>
-            </h1>
-            <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">
-              En Tatlı Yarışma 🏆
-            </p>
-          </a>
+          {/* ANA KAPSÜL */}
+          <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
+            
+            {/* TIKLANABİLİR LOGO */}
+            <a href="/" className="flex flex-col pl-3 active:scale-95 transition-transform cursor-pointer group">
+              <h1 className="text-xl font-black text-white tracking-tighter leading-none italic group-hover:text-amber-500 transition-colors">
+                Cici<span className="text-amber-500 group-hover:text-white">Pet</span>
+              </h1>
+              <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">
+                En Tatlı Yarışma 🏆
+              </p>
+            </a>
 
-          <div className="flex items-center gap-2">
-            <Link href="/kategoriler" className="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-4 py-2 rounded-2xl text-[9px] font-black uppercase italic text-amber-500 transition-all flex items-center gap-2">
-              📂 Kategoriler
-            </Link>
-            <Link href="/profil" className="bg-white/5 p-2.5 rounded-full border border-white/10 hover:bg-white/10 transition-all active:scale-90">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </Link>
-            <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 hover:bg-red-500/20 transition-all active:scale-90">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#ef4444" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-              </svg>
-            </button>
+            {/* NAVİGASYON İKONLARI */}
+            <div className="flex items-center gap-2">
+              <Link href="/kategoriler" className="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-3 py-2 rounded-2xl text-[9px] font-black uppercase italic text-amber-500 transition-all flex items-center gap-2">
+                📂 Kategoriler
+              </Link>
+              <Link href="/profil" className="bg-white/5 p-2.5 rounded-full border border-white/10 hover:bg-white/10 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </Link>
+              <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 hover:bg-red-500/20 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#ef4444" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="relative z-10 -mt-2 pointer-events-auto">
-          <div className="bg-amber-500 px-6 py-1 rounded-b-2xl shadow-[0_10px_20px_rgba(245,158,11,0.4)] flex gap-4 text-[9px] font-black italic text-black uppercase border-x border-b border-amber-600">
-            <span>⚡ {oyHakki} Enerji</span>
+          {/* ENERJİ BAR (Aşağı İndirildi ve Belirginleştirildi) */}
+          <div className="bg-amber-500 px-6 py-1.5 rounded-full shadow-[0_5px_15px_rgba(245,158,11,0.5)] flex gap-4 text-[10px] font-black italic text-black uppercase pointer-events-auto border border-amber-600">
+            <span className="flex items-center gap-1">⚡ {oyHakki} ENERJİ</span>
             <span className="opacity-30">|</span>
-            <span>🏆 {toplamPuan} CP</span>
+            <span className="flex items-center gap-1">🏆 {toplamPuan} CP</span>
           </div>
         </div>
       </div>
@@ -164,11 +168,11 @@ export default function Home() {
           className="h-screen w-full relative flex items-center justify-center snap-start snap-always bg-zinc-900"
         >
           <img src={foto.foto_url} className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-20" alt="" />
-          <div className="relative w-full h-full flex items-center justify-center p-4">
+          <div className="relative w-full h-full flex items-center justify-center p-4 pt-24">
             <img 
               src={foto.foto_url} 
               onDoubleClick={() => begeniAt(index)} 
-              className="max-h-[80vh] w-auto max-w-[95%] rounded-[3rem] shadow-2xl border-[6px] border-white/5 object-contain" 
+              className="max-h-[75vh] w-auto max-w-[95%] rounded-[3rem] shadow-2xl border-[6px] border-white/5 object-contain" 
               alt="Pet" 
             />
             
@@ -192,7 +196,7 @@ export default function Home() {
         </section>
       ))}
 
-      {/* ENERJİ MODAL */}
+      {/* REKLAM MODALI */}
       {reklamModu && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
           <div className="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center shadow-2xl relative text-black">
