@@ -9,7 +9,7 @@ export default function Home() {
   const [fotolar, setFotolar] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [oyHakki, setOyHakki] = useState<number | null>(null);
+  const [oyHakki, setOyHakki] = useState<number | null>(null); 
   const [toplamPuan, setToplamPuan] = useState(0);
   const [reklamModu, setReklamModu] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -94,6 +94,7 @@ export default function Home() {
     const yeniHak = oyHakki - 1;
     const yeniPuan = toplamPuan + secilenPuan;
 
+    // Arayüzü anında güncelle
     setOyHakki(yeniHak);
     setToplamPuan(yeniPuan);
     setFotolar(prev => {
@@ -103,7 +104,11 @@ export default function Home() {
     });
 
     setOylamaPaneli({ open: false, index: null });
+
+    // Veritabanına yaz
     await supabase.from('profil').update({ oy_hakki: yeniHak, toplam_puan: yeniPuan }).eq('id', user.id);
+    
+    // Küçük bir gecikmeyle sonraki pete kaydır
     setTimeout(sonrakiPet, 500);
   };
 
@@ -142,14 +147,13 @@ export default function Home() {
         <div className="w-full max-w-xl flex flex-col items-center gap-2">
           <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
             
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6">
               <Link href="/" onClick={() => window.location.href='/'} className="flex flex-col pl-3 active:scale-95 group transition-transform">
-                <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 tracking-tighter transition-colors">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
-                <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
+                <h1 className="text-lg sm:text-xl font-black text-white italic group-hover:text-amber-500 tracking-tighter transition-colors">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
+                <p className="text-[6px] sm:text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
               </Link>
 
-              {/* KATEGORİLER LİNKİ - BURAYA GELDİ */}
-              <Link href="/kategoriler" className="text-white font-black italic text-[11px] uppercase hover:text-amber-500 transition-colors border-l border-white/10 pl-4 py-1">
+              <Link href="/kategoriler" className="text-white font-black italic text-[10px] sm:text-[11px] uppercase hover:text-amber-500 transition-colors border-l border-white/10 pl-4 py-1">
                 Kategoriler
               </Link>
             </div>
@@ -157,7 +161,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => user ? (window.location.href='/profil') : setShowLoginModal(true)}
-                className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 hover:bg-white/20 transition-all active:scale-95 text-white font-black italic text-[10px]"
+                className="bg-white/5 px-3 sm:px-4 py-2 rounded-2xl border border-white/10 hover:bg-white/20 transition-all active:scale-95 text-white font-black italic text-[10px]"
               >
                 🏆 {toplamPuan} CP
               </button>
@@ -211,7 +215,7 @@ export default function Home() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in duration-300">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl relative text-center">
             <button onClick={() => setShowLoginModal(false)} className="absolute top-6 right-8 text-white/20 hover:text-white font-bold text-xl">×</button>
-            <div className="mb-8 text-center">
+            <div className="mb-8">
               <h2 className="text-2xl font-black text-white italic tracking-tighter">Cici<span className="text-amber-500">Pet</span></h2>
               <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mt-2 italic">Giriş Yap ve Oylamaya Başla</p>
             </div>
