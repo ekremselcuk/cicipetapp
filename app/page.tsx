@@ -15,6 +15,7 @@ export default function Home() {
   const [sayac, setSayac] = useState(0);
   const [liderler, setLiderler] = useState<any[]>([]);
   const [yeniPetAdi, setYeniPetAdi] = useState("");
+  const [oyVeriyor, setOyVeriyor] = useState(false); // Hız sınırı kilidi buraya da geldi
 
   useEffect(() => {
     const checkUser = async () => {
@@ -34,7 +35,7 @@ export default function Home() {
     const { data } = await supabase.from('profil').select('toplam_puan, oy_hakki').eq('id', userId).single();
     if (data) {
       setPuan(data.toplam_puan || 0);
-      setOyHakki(data.oy_hakki ?? 5); // DB'de hak varsa onu al, yoksa 5 ver
+      setOyHakki(data.oy_hakki ?? 5);
     }
   };
 
@@ -66,15 +67,20 @@ export default function Home() {
   };
 
   const oyVer = async () => {
-    if (oyHakki > 0 && user && mevcutFoto) {
-      const yeniHak = oyHakki - 1;
-      const yeniPuan = puan + 1;
-      
-      // Arayüzü anlık güncelle
-      setOyHakki(yeniHak);
-      setPuan(yeniPuan);
+    // Güvenlik: İşlem devam ediyorsa veya enerji yoksa durdur
+    if (oyVeriyor || oyHakki <= 0 || !user || !mevcutFoto) return;
 
-      // Veritabanını güncelle (Hileyi bitiren kısım)
+    setOyVeriyor(true); // Kilidi tak
+
+    const yeniHak = oyHakki - 1;
+    const yeniPuan = puan + 1;
+    
+    // Arayüzü anlık güncelle
+    setOyHakki(yeniHak);
+    setPuan(yeniPuan);
+
+    try {
+      // Veritabanını güncelle
       await supabase.from('profil').update({ 
         toplam_puan: yeniPuan, 
         oy_hakki: yeniHak 
@@ -86,6 +92,11 @@ export default function Home() {
         liderlikGetir();
       }
       yeniFotoGetir();
+    } catch (error) {
+      console.error("Oylama hatası:", error);
+    } finally {
+      // 500ms sonra kilidi aç
+      setTimeout(() => setOyVeriyor(false), 500);
     }
   };
 
@@ -111,7 +122,6 @@ export default function Home() {
 
   const reklamIzle = async () => {
     setReklamIzleniyor(true);
-    // 3 saniye sonra enerjiyi ver ve DB'ye işle
     setTimeout(async () => { 
       const fullHak = 5;
       setOyHakki(fullHak); 
@@ -155,15 +165,18 @@ export default function Home() {
         </div>
 
         <div className="space-y-4">
-          <button onClick={oyVer} disabled={oyHakki === 0 || reklamIzleniyor} className="w-full font-black py-4 rounded-2xl text-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg active:scale-95 transition-all disabled:opacity-50 uppercase italic">
-            {oyHakki > 0 ? "Bayıldım! 🐾" : "Enerji Bitti"}
+          <button 
+            onClick={oyVer} 
+            disabled={oyHakki === 0 || reklamIzleniyor || oyVeriyor} 
+            className="w-full font-black py-4 rounded-2xl text-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg active:scale-95 transition-all disabled:opacity-50 uppercase italic"
+          >
+            {oyVeriyor ? "⏳" : (oyHakki > 0 ? "Bayıldım! 🐾" : "Enerji Bitti")}
           </button>
           {oyHakki === 0 && !reklamIzleniyor && (
             <button onClick={reklamIzle} className="w-full py-3 rounded-xl border-2 border-blue-200 text-blue-500 font-bold text-sm bg-blue-50 hover:bg-blue-100 transition-all uppercase italic">📺 Enerji Tazele (+5)</button>
           )}
         </div>
       </div>
-      {/* Liderlik tablosu aynen kalıyor... */}
     </main>
   );
 }
