@@ -145,26 +145,31 @@ export default function Home() {
               alt="Pet" 
             />
 
-            {/* YÖNLENDİRME VE OY BUTONU ALANI */}
-            <div className="absolute right-4 bottom-24 flex items-end gap-4">
-              {/* Sol Taraf Metinler */}
-              <div className="flex flex-col items-end mb-2 drop-shadow-lg">
-                <span className="text-white font-black italic text-sm uppercase tracking-tighter">Beğendin mi?</span>
-                <span className="text-white/50 font-bold italic text-[9px] uppercase tracking-widest">Kaydır ve Keşfet 🐾</span>
+            {/* YÖNLENDİRME ALANI */}
+            <div className="absolute right-4 bottom-24 flex items-center gap-4">
+              {/* Sol Taraf: Belirgin Metinler ve Hareketli Ok */}
+              <div className="flex flex-col items-end drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                <span className="text-white font-black italic text-base uppercase tracking-tighter">Beğendin mi? ❤️</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-amber-400 font-black italic text-[10px] uppercase tracking-widest animate-pulse">Kaydır ve Keşfet</span>
+                  {/* Hareketli Aşağı Ok */}
+                  <div className="animate-bounce bg-amber-500 p-1 rounded-full shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="white" className="w-3 h-3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
-              {/* Sağ Taraf Buton */}
+              {/* Sağ Taraf: Buton */}
               <button onClick={() => begeniAt(index)} className="group flex flex-col items-center gap-2">
-                <div className={`p-5 rounded-full shadow-2xl transition-all duration-300 ${foto.liked ? 'bg-red-600 scale-110' : oyHakki === 0 ? 'bg-amber-500 animate-bounce' : 'bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20'}`}>
+                <div className={`p-5 rounded-full shadow-2xl transition-all duration-300 ${foto.liked ? 'bg-red-600 scale-110' : oyHakki === 0 ? 'bg-amber-500 animate-bounce' : 'bg-white/10 backdrop-blur-md border border-white/20'}`}>
                   {oyHakki > 0 ? (
                     <span className="text-3xl">❤️</span>
                   ) : (
                     <span className="text-3xl">⚡</span>
                   )}
                 </div>
-                <span className={`text-[10px] font-black uppercase italic tracking-widest drop-shadow-md ${foto.liked ? 'text-red-500' : 'text-white'}`}>
-                  {foto.liked ? 'Oylandı' : oyHakki === 0 ? 'Enerji Al' : 'Oy Ver'}
-                </span>
               </button>
             </div>
           </div>
@@ -177,7 +182,7 @@ export default function Home() {
           <div className="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center shadow-2xl relative">
             <button onClick={() => setReklamModu(false)} className="absolute top-4 right-6 text-gray-400 font-bold text-xl">×</button>
             <h2 className="text-2xl font-black text-amber-600 uppercase italic mb-2">Enerji Bitti!</h2>
-            <p className="text-gray-500 text-[10px] font-bold uppercase mb-6">Devam etmek için robot olmadığını kanıtla</p>
+            <p className="text-gray-500 text-[10px] font-bold uppercase mb-6 text-center">Robot olmadığını kanıtla ve devam et</p>
             
             {reklamIzleniyor ? (
               <div className="py-10 flex flex-col items-center gap-4">
