@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import Turnstile from 'react-turnstile';
+// Eğer hata alırsan './login' yerine '@/app/login' dene
 import Login from './login';
 
 export default function Home() {
@@ -23,7 +24,6 @@ export default function Home() {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Sayfa açılır açılmaz kedileri getir, kullanıcıyı sonra kontrol et
     kediGetir();
     checkUser();
   }, []);
@@ -76,7 +76,7 @@ export default function Home() {
 
   const oylamaAc = (index: number) => {
     if (!user) {
-      setShowLoginModal(true); // Giriş yapmayanlara modal aç
+      setShowLoginModal(true);
       return;
     }
     if (oyHakki <= 0) { setReklamModu(true); return; }
@@ -132,9 +132,6 @@ export default function Home() {
       setCaptchaToken(null);
     }, 2000);
   };
-
-  // KRİTİK: Burada eskiden "if (!user) return <Login />" vardı. SİLDİM!
-  // Artık direkt sayfa render ediliyor.
 
   return (
     <main ref={scrollContainerRef} className="h-screen w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide select-none">
@@ -208,7 +205,7 @@ export default function Home() {
             <button onClick={() => setShowLoginModal(false)} className="absolute top-6 right-8 text-white/20 hover:text-white font-bold text-xl">×</button>
             <div className="mb-8">
               <h2 className="text-2xl font-black text-white italic tracking-tighter">Cici<span className="text-amber-500">Pet</span></h2>
-              <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mt-2 italic">Devam etmek için giriş yapmalısın</p>
+              <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mt-2 italic">Giriş Yap ve Oylamaya Başla</p>
             </div>
             <Login /> 
           </div>
