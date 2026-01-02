@@ -113,11 +113,9 @@ export default function Home() {
   return (
     <main ref={scrollContainerRef} className="h-screen w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide select-none">
       
-      {/* GLOBAL PREMIUM ÜST BAR */}
-      <div className="fixed top-0 left-0 w-full z-40 p-4">
-        <div className="max-w-xl mx-auto flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl">
-          
-          {/* LOGO SECTİON */}
+      {/* ÜST BAR VE ENERJİ SAYACI */}
+      <div className="fixed top-0 left-0 w-full z-50 p-4 flex flex-col items-center">
+        <div className="w-full max-w-xl flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl relative z-20">
           <div className="flex flex-col pl-3">
             <h1 className="text-xl font-black text-white tracking-tighter leading-none italic">
               Cici<span className="text-amber-500">Pet</span>
@@ -127,19 +125,16 @@ export default function Home() {
             </p>
           </div>
 
-          {/* NAVIGATION */}
           <div className="flex items-center gap-2">
             <Link href="/kategoriler" className="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-4 py-2 rounded-2xl text-[9px] font-black uppercase italic text-amber-500 transition-all flex items-center gap-2">
               📂 Kategoriler
             </Link>
-
-            <Link href="/profil" className="bg-white/5 p-2.5 rounded-full border border-white/10 hover:bg-white/10 transition-all active:scale-90" title="Profil">
+            <Link href="/profil" className="bg-white/5 p-2.5 rounded-full border border-white/10 hover:bg-white/10 transition-all active:scale-90">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
               </svg>
             </Link>
-
-            <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 hover:bg-red-500/20 transition-all active:scale-90" title="Çıkış">
+            <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 hover:bg-red-500/20 transition-all active:scale-90">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#ef4444" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
               </svg>
@@ -147,11 +142,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* FLOATING ENERGY BAR */}
-        <div className="flex justify-center -mt-3">
-          <div className="bg-amber-500 px-6 py-1 rounded-full shadow-[0_0_25px_rgba(245,158,11,0.5)] flex gap-4 text-[9px] font-black italic text-black uppercase">
+        <div className="relative z-10 -mt-2">
+          <div className="bg-amber-500 px-6 py-1 rounded-b-2xl shadow-[0_10px_20px_rgba(245,158,11,0.4)] flex gap-4 text-[9px] font-black italic text-black uppercase border-x border-b border-amber-600">
             <span>⚡ {oyHakki} Enerji</span>
-            <span className="opacity-20">|</span>
+            <span className="opacity-30">|</span>
             <span>🏆 {toplamPuan} CP</span>
           </div>
         </div>
@@ -163,10 +157,10 @@ export default function Home() {
           <img src={foto.foto_url} className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-20" alt="" />
           <div className="relative w-full h-full flex items-center justify-center p-4">
             <img src={foto.foto_url} onDoubleClick={() => begeniAt(index)} className="max-h-[80vh] w-auto max-w-[95%] rounded-[3rem] shadow-2xl border-[6px] border-white/5 object-contain" alt="Pet" />
-
+            
             <div className="absolute right-4 bottom-24 flex items-center gap-4">
-              <div className="flex flex-col items-end drop-shadow-[0_2px_15px_rgba(0,0,0,1)]">
-                <span className="text-white font-black italic text-base uppercase tracking-tighter">Beğendin mi? ❤️</span>
+              <div className="flex flex-col items-end drop-shadow-[0_2px_15px_rgba(0,0,0,1)] text-white">
+                <span className="font-black italic text-base uppercase tracking-tighter">Beğendin mi? ❤️</span>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-amber-400 font-black italic text-[10px] uppercase tracking-widest animate-pulse">Kaydır ve Keşfet</span>
                   <div className="animate-bounce bg-amber-500 p-1 rounded-full shadow-lg">
@@ -174,8 +168,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
-              <button onClick={() => begeniAt(index)} className="group flex flex-col items-center gap-2 transition-transform active:scale-90">
+              <button onClick={() => begeniAt(index)} className="group transition-transform active:scale-90">
                 <div className={`p-5 rounded-full shadow-2xl transition-all duration-300 ${foto.liked ? 'bg-red-600 scale-110' : oyHakki === 0 ? 'bg-amber-500 animate-bounce' : 'bg-white/10 backdrop-blur-md border border-white/20'}`}>
                   <span className="text-3xl">{oyHakki > 0 ? '❤️' : '⚡'}</span>
                 </div>
@@ -187,11 +180,11 @@ export default function Home() {
 
       {/* ENERJİ MODAL */}
       {reklamModu && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
-          <div className="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center shadow-2xl relative">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+          <div className="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center shadow-2xl relative text-black">
             <button onClick={() => setReklamModu(false)} className="absolute top-4 right-6 text-gray-400 font-bold text-xl">×</button>
             <h2 className="text-2xl font-black text-amber-600 uppercase italic mb-2">Enerji Bitti!</h2>
-            <p className="text-gray-500 text-[10px] font-bold uppercase mb-6 text-center">Robot olmadığını kanıtla ve devam et</p>
+            <p className="text-gray-500 text-[10px] font-bold uppercase mb-6">Robot olmadığını kanıtla</p>
             {reklamIzleniyor ? (
               <div className="py-10 flex flex-col items-center gap-4">
                 <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
