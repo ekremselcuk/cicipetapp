@@ -31,21 +31,24 @@ export default function Home() {
   };
 
   const yeniFotoGetir = async () => {
-    // Önce bizim veritabanına bak
-    const { data, error } = await supabase.from('fotolar').select('*');
-    
-    if (data && data.length > 0) {
-      // Eğer yüklenmiş foto varsa içinden rastgele seç
-      const rastgeleIndex = Math.floor(Math.random() * data.length);
-      setMevcutFoto(data[rastgeleIndex]);
-    } else {
-      // Foto yoksa rastgele internet fotosu getir
-      const randomId = Math.floor(Math.random() * 1000);
-      setMevcutFoto({ 
-        foto_url: `https://cataas.com/cat?width=400&height=400&sig=${randomId}`, 
-        id: 'default' 
-      });
+    // %50 şansla gerçek petleri veya internet petlerini getir
+    const sans = Math.random() * 10;
+
+    if (sans > 5) {
+      const { data } = await supabase.from('fotolar').select('*');
+      if (data && data.length > 0) {
+        const rastgeleIndex = Math.floor(Math.random() * data.length);
+        setMevcutFoto(data[rastgeleIndex]);
+        return;
+      }
     }
+
+    // İnternet fotosu (Veritabanı boşsa veya şans böyle güldüyse)
+    const randomId = Math.floor(Math.random() * 1000);
+    setMevcutFoto({ 
+      foto_url: `https://cataas.com/cat?width=400&height=400&sig=${randomId}`, 
+      id: 'default' 
+    });
   };
 
   const oyVer = async () => {
@@ -54,10 +57,8 @@ export default function Home() {
       setPuan(yeniPuan);
       setOyHakki(oyHakki - 1);
 
-      // Oy verenin puanını güncelle
       await supabase.from('profil').upsert({ id: user.id, toplam_puan: yeniPuan });
 
-      // Eğer yüklenmiş bir fotoysa onun puanını artır
       if (mevcutFoto.id !== 'default') {
         const { data: fotoData } = await supabase.from('fotolar').select('puan').eq('id', mevcutFoto.id).single();
         await supabase.from('fotolar').update({ puan: (fotoData?.puan || 0) + 1 }).eq('id', mevcutFoto.id);
@@ -74,7 +75,6 @@ export default function Home() {
     setYukleniyor(true);
     const fileName = `${user.id}-${Date.now()}.${file.name.split('.').pop()}`;
 
-    // 1. Storage'a yükle
     const { error: uploadError } = await supabase.storage.from('pet-photos').upload(fileName, file);
 
     if (uploadError) {
@@ -83,14 +83,12 @@ export default function Home() {
       return;
     }
 
-    // 2. Linki al
     const { data: { publicUrl } } = supabase.storage.from('pet-photos').getPublicUrl(fileName);
 
-    // 3. Veritabanına yaz
     await supabase.from('fotolar').insert([{ user_id: user.id, foto_url: publicUrl, pet_adi: "Cici Pet" }]);
 
     setYukleniyor(false);
-    alert("Patili dostun başarıyla yüklendi! Artık oylanabilir. 🐾");
+    alert("Patili dostun başarıyla yüklendi! 🐾");
     yeniFotoGetir();
   };
 
@@ -111,7 +109,7 @@ export default function Home() {
   if (!user) return <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 p-8 text-center"><h1 className="text-5xl font-black text-amber-600 mb-4 tracking-tighter">🐾 CiciPet</h1><Login /></main>;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-b from-amber-50 to-orange-100">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-b from-amber-50 to-orange-100 font-sans">
       <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl text-center border-8 border-white w-full max-w-sm relative overflow-hidden">
         
         <div className="flex justify-between items-center mb-6">
@@ -145,7 +143,7 @@ export default function Home() {
           )}
 
           <div className="relative group">
-            <input type="file" accept="image/*" onChange={fotoYukle} disabled={yukleniyor} className="absolute inset-0 opacity-0 cursor-pointer z-10" title="" />
+            <input type="file" accept="image/*" onChange={fotoYukle} disabled={yukleniyor} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
             <div className="w-full py-4 rounded-2xl border-2 border-dashed border-amber-300 text-amber-600 font-black text-sm bg-amber-50 flex items-center justify-center gap-2">
               {yukleniyor ? "PATİ YÜKLENİYOR..." : "📸 KENDİ PATİNİ YÜKLE"}
             </div>
