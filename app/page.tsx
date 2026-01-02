@@ -44,7 +44,6 @@ export default function Home() {
 
   if (loading) return <div className="flex min-h-screen items-center justify-center bg-amber-50 text-amber-600 font-black animate-pulse">YÜKLENİYOR...</div>;
   
-  // GİRİŞ YAPILMAMIŞ EKRAN (Buradaki uppercase kaldırıldı)
   if (!user) return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 p-8 text-center">
       <h1 className="text-5xl font-black text-amber-600 mb-4 tracking-tighter normal-case">🐾 CiciPet</h1>
@@ -61,7 +60,7 @@ export default function Home() {
         
         <div className="flex justify-between items-center mb-6 relative">
           <div className="bg-amber-100 px-3 py-1 rounded-full">
-            <span className="text-[10px] font-black text-amber-600 tracking-widest uppercase">Ayrıl da Gel v1.0</span>
+            <span className="text-[10px] font-black text-amber-600 tracking-widest uppercase">CiciPet - Oyla Kazan</span>
           </div>
           <button onClick={() => supabase.auth.signOut()} className="text-[10px] font-bold text-red-400 hover:text-red-600 transition-colors uppercase tracking-wider">Çıkış Yap</button>
         </div>
