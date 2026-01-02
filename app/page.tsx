@@ -90,6 +90,22 @@ export default function Home() {
     }, 700);
   };
 
+  // PAYLAŞ FONKSİYONU
+  const paylas = async (url: string) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'CiciPet',
+          text: 'Bu tatlı pete bir baksana! 😍',
+          url: url,
+        });
+      } catch (e) { console.log('Paylaşım iptal'); }
+    } else {
+      navigator.clipboard.writeText(url);
+      alert('Link kopyalandı! Arkadaşlarına gönder 🐾');
+    }
+  };
+
   const cikisYap = async () => {
     await supabase.auth.signOut();
     window.location.reload();
@@ -116,16 +132,12 @@ export default function Home() {
       className="h-screen w-full bg-black overflow-y-scroll snap-y snap-stop snap-mandatory scrollbar-hide select-none"
     >
       
-      {/* ÜST BAR VE ENERJİ SAYACI (FIXED DÜZEN) */}
+      {/* ÜST BAR VE ENERJİ SAYACI */}
       <div className="fixed top-0 left-0 w-full z-50 p-4 flex justify-center pointer-events-none">
         <div className="w-full max-w-xl flex flex-col items-center gap-2">
-          
-          {/* ANA KAPSÜL */}
           <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
-            
-            {/* TIKLANABİLİR LOGO */}
-            <a href="/" className="flex flex-col pl-3 active:scale-95 transition-transform cursor-pointer group">
-              <h1 className="text-xl font-black text-white tracking-tighter leading-none italic group-hover:text-amber-500 transition-colors">
+            <a href="/" className="flex flex-col pl-3 active:scale-95 transition-transform group">
+              <h1 className="text-xl font-black text-white tracking-tighter leading-none italic group-hover:text-amber-500">
                 Cici<span className="text-amber-500 group-hover:text-white">Pet</span>
               </h1>
               <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">
@@ -133,17 +145,16 @@ export default function Home() {
               </p>
             </a>
 
-            {/* NAVİGASYON İKONLARI */}
             <div className="flex items-center gap-2">
               <Link href="/kategoriler" className="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-3 py-2 rounded-2xl text-[9px] font-black uppercase italic text-amber-500 transition-all flex items-center gap-2">
                 📂 Kategoriler
               </Link>
-              <Link href="/profil" className="bg-white/5 p-2.5 rounded-full border border-white/10 hover:bg-white/10 transition-all">
+              <Link href="/profil" className="bg-white/5 p-2.5 rounded-full border border-white/10">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </Link>
-              <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 hover:bg-red-500/20 transition-all">
+              <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#ef4444" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                 </svg>
@@ -151,11 +162,10 @@ export default function Home() {
             </div>
           </div>
 
-          {/* ENERJİ BAR (Aşağı İndirildi ve Belirginleştirildi) */}
           <div className="bg-amber-500 px-6 py-1.5 rounded-full shadow-[0_5px_15px_rgba(245,158,11,0.5)] flex gap-4 text-[10px] font-black italic text-black uppercase pointer-events-auto border border-amber-600">
-            <span className="flex items-center gap-1">⚡ {oyHakki} ENERJİ</span>
+            <span>⚡ {oyHakki} ENERJİ</span>
             <span className="opacity-30">|</span>
-            <span className="flex items-center gap-1">🏆 {toplamPuan} CP</span>
+            <span>🏆 {toplamPuan} CP</span>
           </div>
         </div>
       </div>
@@ -176,22 +186,36 @@ export default function Home() {
               alt="Pet" 
             />
             
-            <div className="absolute right-4 bottom-24 flex items-center gap-4">
-              <div className="flex flex-col items-end drop-shadow-[0_2px_15px_rgba(0,0,0,1)] text-white">
-                <span className="font-black italic text-base uppercase tracking-tighter">Beğendin mi? ❤️</span>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-amber-400 font-black italic text-[10px] uppercase tracking-widest animate-pulse">Kaydır ve Keşfet</span>
-                  <div className="animate-bounce bg-amber-500 p-1 rounded-full shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="white" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" /></svg>
+            <div className="absolute right-4 bottom-24 flex flex-col items-center gap-4">
+              
+              {/* PAYLAŞ BUTONU */}
+              <button onClick={() => paylas(foto.foto_url)} className="p-4 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all active:scale-90 shadow-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0-10.628a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zm0 10.628a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" />
+                </svg>
+              </button>
+
+              {/* BEĞENİ BUTONU */}
+              <div className="flex flex-col items-center gap-2">
+                <button onClick={() => begeniAt(index)} className="group transition-transform active:scale-90">
+                  <div className={`p-5 rounded-full shadow-2xl transition-all duration-300 ${foto.liked ? 'bg-red-600 scale-110' : oyHakki === 0 ? 'bg-amber-500 animate-bounce' : 'bg-white/10 backdrop-blur-md border border-white/20'}`}>
+                    <span className="text-3xl">{oyHakki > 0 ? '❤️' : '⚡'}</span>
                   </div>
+                </button>
+              </div>
+
+            </div>
+
+            {/* KAYDIRMA YAZISI (SOLDA) */}
+            <div className="absolute left-6 bottom-24 drop-shadow-[0_2px_15px_rgba(0,0,0,1)] text-white">
+              <div className="flex flex-col gap-1 items-start">
+                <span className="text-amber-400 font-black italic text-[10px] uppercase tracking-widest animate-pulse">Kaydır ve Keşfet</span>
+                <div className="animate-bounce bg-amber-500 p-1 rounded-full shadow-lg ml-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="white" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" /></svg>
                 </div>
               </div>
-              <button onClick={() => begeniAt(index)} className="group transition-transform active:scale-90">
-                <div className={`p-5 rounded-full shadow-2xl transition-all duration-300 ${foto.liked ? 'bg-red-600 scale-110' : oyHakki === 0 ? 'bg-amber-500 animate-bounce' : 'bg-white/10 backdrop-blur-md border border-white/20'}`}>
-                  <span className="text-3xl">{oyHakki > 0 ? '❤️' : '⚡'}</span>
-                </div>
-              </button>
             </div>
+
           </div>
         </section>
       ))}
@@ -202,7 +226,6 @@ export default function Home() {
           <div className="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center shadow-2xl relative text-black">
             <button onClick={() => setReklamModu(false)} className="absolute top-4 right-6 text-gray-400 font-bold text-xl">×</button>
             <h2 className="text-2xl font-black text-amber-600 uppercase italic mb-2">Enerji Bitti!</h2>
-            <p className="text-gray-500 text-[10px] font-bold uppercase mb-6">Robot olmadığını kanıtla</p>
             {reklamIzleniyor ? (
               <div className="py-10 flex flex-col items-center gap-4">
                 <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
@@ -211,7 +234,7 @@ export default function Home() {
             ) : (
               <div className="space-y-6 flex flex-col items-center">
                 <Turnstile sitekey="0x4AAAAAACKO4jMEI3P1ys-3" onVerify={(token) => setCaptchaToken(token)} />
-                <button onClick={enerjiTazele} disabled={!captchaToken} className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black uppercase italic shadow-lg disabled:opacity-30 active:scale-95 transition-all">
+                <button onClick={enerjiTazele} disabled={!captchaToken} className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black uppercase italic shadow-lg active:scale-95">
                   Enerji Tazele (+5)
                 </button>
               </div>
