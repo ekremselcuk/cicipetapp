@@ -14,6 +14,7 @@ export default function Home() {
   const [yukleniyor, setYukleniyor] = useState(false);
   const [sayac, setSayac] = useState(0);
   const [liderler, setLiderler] = useState<any[]>([]);
+  const [yeniPetAdi, setYeniPetAdi] = useState("");
 
   useEffect(() => {
     const checkUser = async () => {
@@ -46,13 +47,9 @@ export default function Home() {
   const yeniFotoGetir = async () => {
     const yeniSayac = sayac + 1;
     setSayac(yeniSayac);
-
     if (yeniSayac % 2 === 0) {
       const randomId = Math.floor(Math.random() * 5000);
-      setMevcutFoto({ 
-        foto_url: `https://cataas.com/cat?width=400&height=400&sig=${randomId}`, 
-        id: 'default' 
-      });
+      setMevcutFoto({ foto_url: `https://cataas.com/cat?width=400&height=400&sig=${randomId}`, id: 'default' });
     } else {
       const { data } = await supabase.from('fotolar').select('*');
       if (data && data.length > 0) {
@@ -60,10 +57,7 @@ export default function Home() {
         setMevcutFoto(data[rastgeleIndex]);
       } else {
         const randomId = Math.floor(Math.random() * 5000);
-        setMevcutFoto({ 
-          foto_url: `https://cataas.com/cat?width=400&height=400&sig=${randomId}`, 
-          id: 'default' 
-        });
+        setMevcutFoto({ foto_url: `https://cataas.com/cat?width=400&height=400&sig=${randomId}`, id: 'default' });
       }
     }
   };
@@ -73,22 +67,19 @@ export default function Home() {
       const yeniPuan = puan + 1;
       setPuan(yeniPuan);
       setOyHakki(oyHakki - 1);
-
       await supabase.from('profil').upsert({ id: user.id, toplam_puan: yeniPuan });
-
       if (mevcutFoto.id !== 'default') {
         const { data: fotoData } = await supabase.from('fotolar').select('puan').eq('id', mevcutFoto.id).single();
         await supabase.from('fotolar').update({ puan: (fotoData?.puan || 0) + 1 }).eq('id', mevcutFoto.id);
         liderlikGetir();
       }
-
       yeniFotoGetir();
     }
   };
 
   const fotoYukle = async (e: any) => {
     const file = e.target.files[0];
-    if (!file || !user) return;
+    if (!file || !user || !yeniPetAdi.trim()) return;
 
     setYukleniyor(true);
     const fileName = `${user.id}-${Date.now()}.${file.name.split('.').pop()}`;
@@ -101,20 +92,18 @@ export default function Home() {
     }
 
     const { data: { publicUrl } } = supabase.storage.from('pet-photos').getPublicUrl(fileName);
-    await supabase.from('fotolar').insert([{ user_id: user.id, foto_url: publicUrl, pet_adi: "Cici Pati" }]);
+    await supabase.from('fotolar').insert([{ user_id: user.id, foto_url: publicUrl, pet_adi: yeniPetAdi.trim() }]);
 
     setYukleniyor(false);
-    alert("Patili dostun yarışmaya katıldı! 🐾");
+    setYeniPetAdi("");
+    alert(`${yeniPetAdi} yarışmaya katıldı! 🐾`);
     liderlikGetir();
     yeniFotoGetir();
   };
 
   const reklamIzle = () => {
     setReklamIzleniyor(true);
-    setTimeout(() => {
-      setOyHakki(5);
-      setReklamIzleniyor(false);
-    }, 3000);
+    setTimeout(() => { setOyHakki(5); setReklamIzleniyor(false); }, 3000);
   };
 
   const cikisYap = async () => {
@@ -122,31 +111,26 @@ export default function Home() {
     window.location.reload();
   };
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center bg-amber-50 font-black text-amber-600 uppercase">Yükleniyor...</div>;
+  if (loading) return <div className="flex min-h-screen items-center justify-center bg-amber-50 font-black text-amber-600 uppercase italic">Yükleniyor...</div>;
   if (!user) return <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 p-8 text-center font-sans"><h1 className="text-5xl font-black text-amber-600 mb-4 tracking-tighter uppercase italic">CiciPet</h1><Login /></main>;
 
   return (
     <main className="flex min-h-screen flex-col items-center p-4 bg-gradient-to-b from-amber-50 to-orange-100 font-sans pb-20">
       
-      {/* Üst Kart: Oylama Alanı */}
       <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl text-center border-8 border-white w-full max-w-sm relative overflow-hidden mb-8 mt-4">
         <div className="flex justify-between items-center mb-6">
-          <Link href="/profil" className="text-[10px] font-black text-amber-600 bg-amber-100 px-4 py-2 rounded-full uppercase tracking-widest italic hover:bg-amber-200 transition-all">
-            Profilim 👤
-          </Link>
-          <button onClick={cikisYap} className="text-[10px] font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg uppercase hover:bg-red-100 transition-all">
-            Çıkış
-          </button>
+          <Link href="/profil" className="text-[10px] font-black text-amber-600 bg-amber-100 px-4 py-2 rounded-full uppercase tracking-widest italic hover:bg-amber-200 transition-all">Profilim 👤</Link>
+          <button onClick={cikisYap} className="text-[10px] font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg uppercase hover:bg-red-100 transition-all">Çıkış</button>
         </div>
 
-        <div className="mb-1 text-gray-400 font-bold text-xs uppercase tracking-widest">Senin Puanın</div>
+        <div className="mb-1 text-gray-400 font-bold text-xs uppercase tracking-widest">Puanın</div>
         <div className="text-6xl mb-6 font-black text-amber-500">{puan} <span className="text-xl italic lowercase text-amber-300">cp</span></div>
 
         <div className="relative w-full h-80 rounded-3xl overflow-hidden bg-gray-50 border-4 border-white shadow-inner mb-6">
           {reklamIzleniyor ? (
             <div className="flex flex-col items-center justify-center h-full gap-3 bg-amber-50">
               <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-amber-600 font-bold text-sm uppercase">Enerji Tazeleniyor...</p>
+              <p className="text-amber-600 font-bold text-sm uppercase italic">Enerji Doluyor...</p>
             </div>
           ) : (
             <img key={mevcutFoto?.foto_url} src={mevcutFoto?.foto_url} alt="Pet" className="w-full h-full object-cover" />
@@ -154,46 +138,53 @@ export default function Home() {
         </div>
 
         <div className="space-y-4">
-          <button onClick={oyVer} disabled={oyHakki === 0 || reklamIzleniyor} className="w-full font-black py-4 rounded-2xl text-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg active:scale-95 transition-all disabled:opacity-50 uppercase">
-            {oyHakki > 0 ? "Buna Bayıldım! 🐾" : "Enerji Bitti"}
+          <button onClick={oyVer} disabled={oyHakki === 0 || reklamIzleniyor} className="w-full font-black py-4 rounded-2xl text-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg active:scale-95 transition-all disabled:opacity-50 uppercase italic">
+            {oyHakki > 0 ? "Bayıldım! 🐾" : "Enerji Bitti"}
           </button>
 
           {oyHakki === 0 && !reklamIzleniyor && (
-            <button onClick={reklamIzle} className="w-full py-3 rounded-xl border-2 border-blue-200 text-blue-500 font-bold text-sm bg-blue-50 hover:bg-blue-100 transition-all uppercase">
-              📺 Enerji Tazele (+5)
-            </button>
+            <button onClick={reklamIzle} className="w-full py-3 rounded-xl border-2 border-blue-200 text-blue-500 font-bold text-sm bg-blue-50 hover:bg-blue-100 transition-all uppercase italic">📺 Enerji Tazele (+5)</button>
           )}
 
-          <div className="relative group">
-            <input type="file" accept="image/*" onChange={fotoYukle} disabled={yukleniyor} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
-            <div className="w-full py-4 rounded-2xl border-2 border-dashed border-amber-300 text-amber-600 font-black text-sm bg-amber-50 flex items-center justify-center gap-2 uppercase">
-              {yukleniyor ? "Yükleniyor..." : "📸 Kendi Patini Yükle"}
+          <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-100 space-y-3">
+            <input 
+              type="text" 
+              placeholder="Önce Patinin İsmini Yaz!" 
+              value={yeniPetAdi}
+              onChange={(e) => setYeniPetAdi(e.target.value)}
+              className="w-full bg-white border-2 border-amber-200 rounded-xl px-4 py-2 text-sm font-bold text-amber-700 outline-none placeholder:text-amber-200 uppercase text-center"
+            />
+            <div className="relative">
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={fotoYukle} 
+                disabled={yukleniyor || !yeniPetAdi.trim()} 
+                className={`absolute inset-0 z-10 ${yeniPetAdi.trim() ? 'cursor-pointer' : 'cursor-not-allowed'}`} 
+              />
+              <div className={`w-full py-3 rounded-xl border-2 border-dashed font-black text-sm flex items-center justify-center gap-2 uppercase transition-all ${yeniPetAdi.trim() ? 'border-amber-500 text-amber-600 bg-white shadow-md' : 'border-gray-200 text-gray-300 bg-gray-50'}`}>
+                {yukleniyor ? "Yükleniyor..." : "📸 Foto Seç ve Katıl"}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Alt Kart: Liderlik Tablosu */}
       <div className="w-full max-w-sm bg-white rounded-[2rem] p-6 shadow-xl border-4 border-white">
-        <h2 className="text-xl font-black text-amber-600 uppercase italic mb-4 flex items-center gap-2">
-          🏆 Liderler (Top 5)
-        </h2>
+        <h2 className="text-xl font-black text-amber-600 uppercase italic mb-4 flex items-center gap-2">🏆 Liderler (Top 5)</h2>
         <div className="space-y-3">
-          {liderler.length > 0 ? liderler.map((pet, index) => (
+          {liderler.map((pet, index) => (
             <div key={index} className="flex items-center justify-between p-2 rounded-xl bg-amber-50 border border-amber-100">
               <div className="flex items-center gap-3">
                 <span className="font-black text-amber-500 w-4">#{index + 1}</span>
                 <img src={pet.foto_url} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" alt="" />
-                <span className="font-bold text-gray-700 text-sm truncate w-24 text-left">{pet.pet_adi}</span>
+                <span className="font-bold text-gray-700 text-sm truncate w-24 text-left uppercase">{pet.pet_adi}</span>
               </div>
-              <div className="font-black text-orange-500">{pet.puan} <span className="text-[10px] text-orange-300">CP</span></div>
+              <div className="font-black text-orange-500">{pet.puan} <span className="text-[10px] text-orange-300 uppercase">cp</span></div>
             </div>
-          )) : (
-            <div className="text-gray-400 text-sm font-bold animate-pulse italic">Henüz yarışmacı yok, ilk sen yükle!</div>
-          )}
+          ))}
         </div>
       </div>
-
     </main>
   );
 }
