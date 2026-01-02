@@ -111,19 +111,24 @@ export default function Home() {
   if (!user) return <main className="h-screen flex items-center justify-center bg-black"><Login /></main>;
 
   return (
-    <main ref={scrollContainerRef} className="h-screen w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide select-none">
+    <main 
+      ref={scrollContainerRef} 
+      className="h-screen w-full bg-black overflow-y-scroll snap-y snap-stop snap-mandatory scrollbar-hide select-none"
+    >
       
       {/* ÜST BAR VE ENERJİ SAYACI */}
-      <div className="fixed top-0 left-0 w-full z-50 p-4 flex flex-col items-center">
-        <div className="w-full max-w-xl flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl relative z-20">
-          <div className="flex flex-col pl-3">
-            <h1 className="text-xl font-black text-white tracking-tighter leading-none italic">
-              Cici<span className="text-amber-500">Pet</span>
+      <div className="fixed top-0 left-0 w-full z-50 p-4 flex flex-col items-center pointer-events-none">
+        <div className="w-full max-w-xl flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl relative z-20 pointer-events-auto">
+          
+          {/* TIKLANABİLİR LOGO SECTION */}
+          <a href="/" className="flex flex-col pl-3 active:scale-95 transition-transform cursor-pointer group">
+            <h1 className="text-xl font-black text-white tracking-tighter leading-none italic group-hover:text-amber-500 transition-colors">
+              Cici<span className="text-amber-500 group-hover:text-white">Pet</span>
             </h1>
             <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">
               En Tatlı Yarışma 🏆
             </p>
-          </div>
+          </a>
 
           <div className="flex items-center gap-2">
             <Link href="/kategoriler" className="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-4 py-2 rounded-2xl text-[9px] font-black uppercase italic text-amber-500 transition-all flex items-center gap-2">
@@ -142,7 +147,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 -mt-2">
+        <div className="relative z-10 -mt-2 pointer-events-auto">
           <div className="bg-amber-500 px-6 py-1 rounded-b-2xl shadow-[0_10px_20px_rgba(245,158,11,0.4)] flex gap-4 text-[9px] font-black italic text-black uppercase border-x border-b border-amber-600">
             <span>⚡ {oyHakki} Enerji</span>
             <span className="opacity-30">|</span>
@@ -153,10 +158,19 @@ export default function Home() {
 
       {/* AKIŞ */}
       {fotolar.map((foto, index) => (
-        <section key={foto.id + index} ref={fotolar.length === index + 1 ? sonElemanRef : null} className="h-screen w-full relative flex items-center justify-center snap-start bg-zinc-900">
+        <section 
+          key={foto.id + index} 
+          ref={fotolar.length === index + 1 ? sonElemanRef : null} 
+          className="h-screen w-full relative flex items-center justify-center snap-start snap-always bg-zinc-900"
+        >
           <img src={foto.foto_url} className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-20" alt="" />
           <div className="relative w-full h-full flex items-center justify-center p-4">
-            <img src={foto.foto_url} onDoubleClick={() => begeniAt(index)} className="max-h-[80vh] w-auto max-w-[95%] rounded-[3rem] shadow-2xl border-[6px] border-white/5 object-contain" alt="Pet" />
+            <img 
+              src={foto.foto_url} 
+              onDoubleClick={() => begeniAt(index)} 
+              className="max-h-[80vh] w-auto max-w-[95%] rounded-[3rem] shadow-2xl border-[6px] border-white/5 object-contain" 
+              alt="Pet" 
+            />
             
             <div className="absolute right-4 bottom-24 flex items-center gap-4">
               <div className="flex flex-col items-end drop-shadow-[0_2px_15px_rgba(0,0,0,1)] text-white">
