@@ -43,7 +43,7 @@ export default function Home() {
   };
 
   if (loading) return <div className="flex min-h-screen items-center justify-center bg-amber-50 text-amber-600 font-black animate-pulse">YÜKLENİYOR...</div>;
-  if (!user) return <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 p-8 text-center"><h1 className="text-5xl font-black text-amber-600 mb-4 tracking-tighter">🐾 PET-VOTE</h1><p className="text-amber-800 mb-8 font-medium">En tatlı patileri oylamaya hazır mısın?</p><Login /></main>;
+  if (!user) return <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 p-8 text-center"><h1 className="text-5xl font-black text-amber-600 mb-4 tracking-tighter">🐾 CICIPET</h1><p className="text-amber-800 mb-8 font-medium">En tatlı patileri oylamaya hazır mısın?</p><Login /></main>;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-b from-amber-50 to-orange-100">
@@ -59,9 +59,9 @@ export default function Home() {
           <button onClick={() => supabase.auth.signOut()} className="text-[10px] font-bold text-red-400 hover:text-red-600 transition-colors uppercase tracking-wider">Çıkış Yap</button>
         </div>
 
-        <div className="mb-2 text-gray-400 font-bold text-xs uppercase tracking-widest">Toplam Bakiyen</div>
+        <div className="mb-2 text-gray-400 font-bold text-xs uppercase tracking-widest">Toplam CiciPuan</div>
         <div className="text-6xl mb-8 font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-600 drop-shadow-sm">
-          {puan} <span className="text-xl text-orange-400 italic">P</span>
+          {puan} <span className="text-xl text-orange-400 italic">CP</span>
         </div>
 
         <div className="relative group cursor-pointer active:scale-95 transition-transform duration-200">
