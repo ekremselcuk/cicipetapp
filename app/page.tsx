@@ -43,7 +43,15 @@ export default function Home() {
   };
 
   if (loading) return <div className="flex min-h-screen items-center justify-center bg-amber-50 text-amber-600 font-black animate-pulse">YÜKLENİYOR...</div>;
-  if (!user) return <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 p-8 text-center"><h1 className="text-5xl font-black text-amber-600 mb-4 tracking-tighter">🐾 CiciPet</h1><p className="text-amber-800 mb-8 font-medium">En tatlı patileri oylamaya hazır mısın?</p><Login /></main>;
+  
+  // GİRİŞ YAPILMAMIŞ EKRAN (Buradaki uppercase kaldırıldı)
+  if (!user) return (
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 p-8 text-center">
+      <h1 className="text-5xl font-black text-amber-600 mb-4 tracking-tighter normal-case">🐾 CiciPet</h1>
+      <p className="text-amber-800 mb-8 font-medium">En tatlı patileri oylamaya hazır mısın?</p>
+      <Login />
+    </main>
+  );
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-b from-amber-50 to-orange-100">
