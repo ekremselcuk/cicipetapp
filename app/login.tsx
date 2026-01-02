@@ -2,33 +2,28 @@
 import { supabase } from '@/lib/supabase';
 
 export default function Login() {
-  // TEST İÇİN: Şifresiz, hızlı giriş yöntemi (Magic Link)
-  const handleLogin = async () => {
-    const email = prompt("Test için e-posta adresini gir:");
-    if (!email) return;
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email,
+  const googleIleGiris = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
       options: {
-        emailRedirectTo: window.location.origin,
+        redirectTo: window.location.origin,
       },
     });
-
-    if (error) {
-      alert("Hata: " + error.message);
-    } else {
-      alert("Giriş bağlantısı e-postana gönderildi! (Spam kutusuna bakmayı unutma)");
-    }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4">
-      <button 
-        onClick={handleLogin}
-        className="bg-amber-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-amber-700 transition-all"
+    <div className="flex flex-col gap-4 w-full max-w-xs mx-auto">
+      <button
+        onClick={googleIleGiris}
+        className="flex items-center justify-center gap-3 bg-white text-gray-700 font-bold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-2 border-gray-50 active:scale-95"
       >
-        E-posta ile Hızlı Giriş Yap
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+        Google ile Devam Et
       </button>
+      
+      <p className="text-[10px] text-amber-900/40 font-medium uppercase tracking-widest">
+        Güvenli ve hızlı giriş
+      </p>
     </div>
   );
 }
