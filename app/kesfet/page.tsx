@@ -9,20 +9,30 @@ export default function Kesfet() {
   const [user, setUser] = useState<any>(null);
   const [oyHakki, setOyHakki] = useState(0);
 
+  const enerjiCek = async (userId: string) => {
+    const { data: profil } = await supabase.from('profil').select('oy_hakki').eq('id', userId).single();
+    if (profil) setOyHakki(profil.oy_hakki);
+  };
+
   useEffect(() => {
     const dataGetir = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
-        const { data: profil } = await supabase.from('profil').select('oy_hakki').eq('id', session.user.id).single();
-        if (profil) setOyHakki(profil.oy_hakki);
+        await enerjiCek(session.user.id);
       }
       const { data } = await supabase.from('fotolar').select('*').order('created_at', { ascending: false });
       if (data) setPetler(data);
       setLoading(false);
     };
     dataGetir();
-  }, []);
+
+    // Sayfaya her geri dönüldüğünde enerjiyi tazele
+    window.addEventListener('focus', () => {
+      if (user) enerjiCek(user.id);
+    });
+    return () => window.removeEventListener('focus', () => {});
+  }, [user?.id]);
 
   const hızlıOyVer = async (e: React.MouseEvent, petId: string, mevcutPuan: number) => {
     e.preventDefault();
@@ -32,13 +42,11 @@ export default function Kesfet() {
     }
 
     const yeniHak = oyHakki - 1;
-    setOyHakki(yeniHak); // Arayüzde hemen düşür
+    setOyHakki(yeniHak);
     
-    // 1. Petin puanını artır
     setPetler(prev => prev.map(p => p.id === petId ? { ...p, puan: (p.puan || 0) + 1 } : p));
     await supabase.from('fotolar').update({ puan: mevcutPuan + 1 }).eq('id', petId);
     
-    // 2. Kullanıcının enerjisini ve toplam puanını güncelle
     const { data: profil } = await supabase.from('profil').select('toplam_puan').eq('id', user.id).single();
     await supabase.from('profil').update({ 
       oy_hakki: yeniHak, 
@@ -54,7 +62,7 @@ export default function Kesfet() {
         <Link href="/" className="bg-white p-3 rounded-2xl shadow-sm text-xs font-black text-amber-600 uppercase italic border-2 border-white">← Geri</Link>
         <div className="text-center">
             <h1 className="text-2xl font-black text-amber-600 uppercase italic tracking-tighter">Keşfet 🌍</h1>
-            <p className="text-[10px] font-bold text-orange-500 uppercase">Enerji: {oyHakki}</p>
+            <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest bg-orange-50 px-3 py-1 rounded-full shadow-inner">⚡ Enerji: {oyHakki}</p>
         </div>
         <div className="w-10"></div>
       </div>
