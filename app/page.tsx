@@ -9,7 +9,7 @@ export default function Home() {
   const [fotolar, setFotolar] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [oyHakki, setOyHakki] = useState<number | null>(null); // Refresh hatası için null başlattık
+  const [oyHakki, setOyHakki] = useState<number | null>(null);
   const [toplamPuan, setToplamPuan] = useState(0);
   const [reklamModu, setReklamModu] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -33,14 +33,14 @@ export default function Home() {
       setUser(session.user);
       fetchUserData(session.user.id);
     } else {
-      setOyHakki(0); // Kullanıcı yoksa 0 set et
+      setOyHakki(0);
     }
   };
 
   const fetchUserData = async (userId: string) => {
     const { data } = await supabase.from('profil').select('oy_hakki, toplam_puan').eq('id', userId).single();
     if (data) {
-      setOyHakki(data.oy_hakki); // Veritabanındaki gerçek değeri direkt basıyoruz
+      setOyHakki(data.oy_hakki);
       setToplamPuan(data.toplam_puan || 0);
     }
   };
@@ -142,11 +142,17 @@ export default function Home() {
         <div className="w-full max-w-xl flex flex-col items-center gap-2">
           <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
             
-            {/* LOGO DÜZELTME: Hem Link hem onClick ile kesin çözüm */}
-            <Link href="/" onClick={() => window.location.href='/'} className="flex flex-col pl-3 active:scale-95 group transition-transform">
-              <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 tracking-tighter transition-colors">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
-              <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
-            </Link>
+            <div className="flex items-center gap-6">
+              <Link href="/" onClick={() => window.location.href='/'} className="flex flex-col pl-3 active:scale-95 group transition-transform">
+                <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 tracking-tighter transition-colors">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
+                <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
+              </Link>
+
+              {/* KATEGORİLER LİNKİ - BURAYA GELDİ */}
+              <Link href="/kategoriler" className="text-white font-black italic text-[11px] uppercase hover:text-amber-500 transition-colors border-l border-white/10 pl-4 py-1">
+                Kategoriler
+              </Link>
+            </div>
             
             <div className="flex items-center gap-2">
               <button 
@@ -163,7 +169,6 @@ export default function Home() {
               )}
             </div>
           </div>
-          {/* ENERJİ BAR DÜZELTME: oyHakki null değilse göster (Refresh koruması) */}
           {user && oyHakki !== null && (
             <div className="bg-amber-500 px-6 py-1 rounded-full shadow-lg text-[10px] font-black italic text-black uppercase pointer-events-auto border border-amber-600 animate-pulse">
               ⚡ {oyHakki} ENERJİ
@@ -206,7 +211,7 @@ export default function Home() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in duration-300">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl relative text-center">
             <button onClick={() => setShowLoginModal(false)} className="absolute top-6 right-8 text-white/20 hover:text-white font-bold text-xl">×</button>
-            <div className="mb-8">
+            <div className="mb-8 text-center">
               <h2 className="text-2xl font-black text-white italic tracking-tighter">Cici<span className="text-amber-500">Pet</span></h2>
               <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mt-2 italic">Giriş Yap ve Oylamaya Başla</p>
             </div>
