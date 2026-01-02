@@ -150,7 +150,7 @@ export default function Home() {
 
               {/* KATEGORİLER LİNKİ - BURAYA GELDİ */}
               <Link href="/kategoriler" className="text-white font-black italic text-[11px] uppercase hover:text-amber-500 transition-colors border-l border-white/10 pl-4 py-1">
-                KATEGORİ
+                Kategoriler
               </Link>
             </div>
             
