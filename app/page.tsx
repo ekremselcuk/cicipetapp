@@ -80,20 +80,16 @@ export default function Home() {
   const fotoYukle = async (e: any) => {
     const file = e.target.files[0];
     if (!file || !user || !yeniPetAdi.trim()) return;
-
     setYukleniyor(true);
     const fileName = `${user.id}-${Date.now()}.${file.name.split('.').pop()}`;
     const { error: uploadError } = await supabase.storage.from('pet-photos').upload(fileName, file);
-
     if (uploadError) {
       alert("Hata: " + uploadError.message);
       setYukleniyor(false);
       return;
     }
-
     const { data: { publicUrl } } = supabase.storage.from('pet-photos').getPublicUrl(fileName);
     await supabase.from('fotolar').insert([{ user_id: user.id, foto_url: publicUrl, pet_adi: yeniPetAdi.trim() }]);
-
     setYukleniyor(false);
     setYeniPetAdi("");
     alert(`${yeniPetAdi} yarışmaya katıldı! 🐾`);
@@ -117,21 +113,21 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center p-4 bg-gradient-to-b from-amber-50 to-orange-100 font-sans pb-20">
       
-      <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl text-center border-8 border-white w-full max-w-sm relative overflow-hidden mb-8 mt-4">
-        
-        {/* YENİ BUTON ALANI */}
-        <div className="flex justify-between items-center mb-6 gap-2">
-          <Link href="/kesfet" className="flex-1 text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-2 rounded-xl uppercase text-center border-2 border-white shadow-sm italic hover:bg-blue-100 transition-all">
-            Keşfet 🌍
-          </Link>
-          <Link href="/profil" className="flex-1 text-[10px] font-black text-amber-600 bg-amber-100 px-3 py-2 rounded-xl uppercase text-center border-2 border-white shadow-sm italic hover:bg-amber-100 transition-all">
-            Profil 👤
-          </Link>
-          <button onClick={cikisYap} className="text-[10px] font-bold text-red-500 bg-red-50 px-3 py-2 rounded-xl uppercase border-2 border-white shadow-sm hover:bg-red-100 transition-all">
-            Çıkış
-          </button>
-        </div>
+      {/* ÜST BUTON BAR (SABİT) */}
+      <div className="w-full max-w-sm flex justify-between items-center gap-2 mb-4">
+        <Link href="/kesfet" className="flex-1 text-[10px] font-black text-blue-600 bg-white px-3 py-3 rounded-2xl uppercase text-center shadow-md border-2 border-blue-100 italic">
+          Keşfet 🌍
+        </Link>
+        <Link href="/profil" className="flex-1 text-[10px] font-black text-amber-600 bg-white px-3 py-3 rounded-2xl uppercase text-center shadow-md border-2 border-amber-100 italic">
+          Profil 👤
+        </Link>
+        <button onClick={cikisYap} className="text-[10px] font-black text-red-500 bg-white px-3 py-3 rounded-2xl uppercase shadow-md border-2 border-red-100">
+          Çıkış
+        </button>
+      </div>
 
+      {/* Oylama Alanı */}
+      <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl text-center border-8 border-white w-full max-w-sm relative mb-8">
         <div className="mb-1 text-gray-400 font-bold text-xs uppercase tracking-widest">Puanın</div>
         <div className="text-6xl mb-6 font-black text-amber-500">{puan} <span className="text-xl italic lowercase text-amber-300">cp</span></div>
 
@@ -150,7 +146,6 @@ export default function Home() {
           <button onClick={oyVer} disabled={oyHakki === 0 || reklamIzleniyor} className="w-full font-black py-4 rounded-2xl text-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg active:scale-95 transition-all disabled:opacity-50 uppercase italic">
             {oyHakki > 0 ? "Bayıldım! 🐾" : "Enerji Bitti"}
           </button>
-
           {oyHakki === 0 && !reklamIzleniyor && (
             <button onClick={reklamIzle} className="w-full py-3 rounded-xl border-2 border-blue-200 text-blue-500 font-bold text-sm bg-blue-50 hover:bg-blue-100 transition-all uppercase italic">📺 Enerji Tazele (+5)</button>
           )}
@@ -164,13 +159,7 @@ export default function Home() {
               className="w-full bg-white border-2 border-amber-200 rounded-xl px-4 py-2 text-sm font-bold text-amber-700 outline-none placeholder:text-amber-200 uppercase text-center"
             />
             <div className="relative">
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={fotoYukle} 
-                disabled={yukleniyor || !yeniPetAdi.trim()} 
-                className={`absolute inset-0 z-10 ${yeniPetAdi.trim() ? 'cursor-pointer' : 'cursor-not-allowed'}`} 
-              />
+              <input type="file" accept="image/*" onChange={fotoYukle} disabled={yukleniyor || !yeniPetAdi.trim()} className={`absolute inset-0 z-10 ${yeniPetAdi.trim() ? 'cursor-pointer' : 'cursor-not-allowed'}`} />
               <div className={`w-full py-3 rounded-xl border-2 border-dashed font-black text-sm flex items-center justify-center gap-2 uppercase transition-all ${yeniPetAdi.trim() ? 'border-amber-500 text-amber-600 bg-white shadow-md' : 'border-gray-200 text-gray-300 bg-gray-50'}`}>
                 {yukleniyor ? "Yükleniyor..." : "📸 Foto Seç ve Katıl"}
               </div>
