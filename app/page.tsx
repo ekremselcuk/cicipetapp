@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Login from './login';
+import Link from 'next/link';
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
@@ -34,7 +35,6 @@ export default function Home() {
   };
 
   const liderlikGetir = async () => {
-    // En yüksek puanlı 5 patili dostu getir
     const { data } = await supabase
       .from('fotolar')
       .select('pet_adi, puan, foto_url')
@@ -79,7 +79,7 @@ export default function Home() {
       if (mevcutFoto.id !== 'default') {
         const { data: fotoData } = await supabase.from('fotolar').select('puan').eq('id', mevcutFoto.id).single();
         await supabase.from('fotolar').update({ puan: (fotoData?.puan || 0) + 1 }).eq('id', mevcutFoto.id);
-        liderlikGetir(); // Puan artınca tabloyu tazele
+        liderlikGetir();
       }
 
       yeniFotoGetir();
@@ -131,8 +131,12 @@ export default function Home() {
       {/* Üst Kart: Oylama Alanı */}
       <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl text-center border-8 border-white w-full max-w-sm relative overflow-hidden mb-8 mt-4">
         <div className="flex justify-between items-center mb-6">
-          <div className="bg-amber-100 px-3 py-1 rounded-full"><span className="text-[10px] font-black text-amber-600 uppercase tracking-widest italic">Ayrıl da gel!</span></div>
-          <button onClick={cikisYap} className="text-[10px] font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg uppercase">Çıkış</button>
+          <Link href="/profil" className="text-[10px] font-black text-amber-600 bg-amber-100 px-4 py-2 rounded-full uppercase tracking-widest italic hover:bg-amber-200 transition-all">
+            Profilim 👤
+          </Link>
+          <button onClick={cikisYap} className="text-[10px] font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg uppercase hover:bg-red-100 transition-all">
+            Çıkış
+          </button>
         </div>
 
         <div className="mb-1 text-gray-400 font-bold text-xs uppercase tracking-widest">Senin Puanın</div>
