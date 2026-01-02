@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import Turnstile from 'react-turnstile';
-import Login from './login'; // Login bileşenini modal içinde kullanacağız
+import Login from './login';
 
 export default function Home() {
   const [fotolar, setFotolar] = useState<any[]>([]);
@@ -17,22 +17,24 @@ export default function Home() {
   
   const [oylamaPaneli, setOylamaPaneli] = useState<{ open: boolean, index: number | null }>({ open: false, index: null });
   const [secilenPuan, setSecilenPuan] = useState<number | null>(null); 
-  const [showLoginModal, setShowLoginModal] = useState(false); // Giriş yapmayanlar için modal
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const observer = useRef<IntersectionObserver | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
+  // KRİTİK DEĞİŞİKLİK: Sayfa yüklenince direkt kedi getir, kullanıcıyı bekleme
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        fetchUserData(session.user.id);
-      }
-      kediGetir(); // Kullanıcı olsa da olmasa da kediler gelsin
-    };
+    kediGetir();
     checkUser();
   }, []);
+
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      setUser(session.user);
+      fetchUserData(session.user.id);
+    }
+  };
 
   const fetchUserData = async (userId: string) => {
     const { data } = await supabase.from('profil').select('oy_hakki, toplam_puan').eq('id', userId).single();
@@ -74,8 +76,9 @@ export default function Home() {
   };
 
   const oylamaAc = (index: number) => {
+    // Giriş yapmamışsa oylama panelini değil, login modalını aç
     if (!user) {
-      setShowLoginModal(true); // Giriş yoksa login modalını aç
+      setShowLoginModal(true);
       return;
     }
     if (oyHakki <= 0) { setReklamModu(true); return; }
@@ -132,6 +135,8 @@ export default function Home() {
     }, 2000);
   };
 
+  // BURADAKİ "if (!user) return <Login />" SATIRINI TAMAMEN SİLDİM.
+  
   return (
     <main ref={scrollContainerRef} className="h-screen w-full bg-black overflow-y-scroll snap-y snap-stop snap-mandatory scrollbar-hide select-none">
       
@@ -142,19 +147,19 @@ export default function Home() {
             
             <Link href="/" className="flex flex-col pl-3 active:scale-95 group">
               <h1 className="text-xl font-black text-white italic group-hover:text-amber-500 transition-colors tracking-tighter">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
-              <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic text-center">En Tatlı Yarışma 🏆</p>
+              <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
             </Link>
             
             <div className="flex items-center gap-2">
               <button 
-                onClick={() => user ? window.location.href='/profil' : setShowLoginModal(true)} 
+                onClick={() => user ? window.location.href='/profil' : setShowLoginModal(true)}
                 className="bg-white/5 px-4 py-2 rounded-2xl border border-white/10 hover:bg-white/20 transition-all active:scale-95 text-white font-black italic text-[10px]"
               >
                 🏆 {toplamPuan} CP
               </button>
 
               {user && (
-                <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 text-red-500 active:scale-90 transition-all hover:bg-red-500/20">
+                <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 text-red-500 active:scale-90 transition-all">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
                 </button>
               )}
@@ -192,18 +197,22 @@ export default function Home() {
         </section>
       ))}
 
-      {/* GİRİŞ MODALI (YENİ) */}
+      {/* LOGIN MODAL (Giriş yapmayanlar için) */}
       {showLoginModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in duration-300">
-          <div className="w-full max-w-sm relative">
-            <button onClick={() => setShowLoginModal(false)} className="absolute -top-12 right-0 text-white/50 hover:text-white font-bold">Kapat</button>
-            <Login /> {/* Google ile Giriş Butonu Buradan Gelecek */}
+          <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl relative text-center">
+            <button onClick={() => setShowLoginModal(false)} className="absolute top-6 right-8 text-white/20 hover:text-white font-bold text-xl">×</button>
+            <div className="mb-8">
+              <h2 className="text-2xl font-black text-white italic tracking-tighter">Cici<span className="text-amber-500">Pet</span></h2>
+              <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-2">Oylamak için giriş yapmalısın</p>
+            </div>
+            <Login /> 
           </div>
         </div>
       )}
 
-      {/* OYLAMA PANELİ */}
-      {oylamaPaneli.open && (
+      {/* OYLAMA PANELİ (Sadece giriş yapmışlar görebilir) */}
+      {oylamaPaneli.open && user && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl">
             <h3 className="text-white text-center font-black italic uppercase text-lg mb-6 tracking-tighter">Puan Ver</h3>
