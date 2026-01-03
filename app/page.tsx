@@ -1,11 +1,21 @@
 'use client';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import Turnstile from 'react-turnstile';
 import Login from './login';
 
+// Ana bileşeni Suspense ile sarmalıyoruz çünkü useSearchParams kullanıyoruz
 export default function Home() {
+  return (
+    <Suspense fallback={<div className="bg-black h-screen w-full flex items-center justify-center text-amber-500 font-black italic uppercase">Yükleniyor...</div>}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const [fotolar, setFotolar] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -19,13 +29,18 @@ export default function Home() {
   const [secilenPuan, setSecilenPuan] = useState<number | null>(null); 
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  const searchParams = useSearchParams();
+  const kategori = searchParams.get('kat') || 'kedi'; // Kategori yoksa kedi getir
+
   const observer = useRef<IntersectionObserver | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    kediGetir();
+    // Kategori değişince listeyi sıfırla ve yeni veri çek
+    setFotolar([]);
+    petGetir(true); 
     checkUser();
-  }, []);
+  }, [kategori]);
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -45,17 +60,25 @@ export default function Home() {
     }
   };
 
-  const kediGetir = async () => {
+  const petGetir = async (sifirla = false) => {
     if (loading) return;
     setLoading(true);
     try {
-      const res = await fetch('https://api.thecatapi.com/v1/images/search?limit=10');
+      // Kategoriye göre API URL seçimi
+      let url = 'https://api.thecatapi.com/v1/images/search?limit=10';
+      if (kategori === 'kopek') {
+        url = 'https://api.thedogapi.com/v1/images/search?limit=10';
+      }
+      
+      const res = await fetch(url);
       const data = await res.json();
-      setFotolar(prev => [...prev, ...data.map((kedi: any) => ({
-        id: kedi.id,
-        foto_url: kedi.url,
+      const yeniPetler = data.map((pet: any) => ({
+        id: pet.id,
+        foto_url: pet.url,
         liked: false
-      }))]);
+      }));
+
+      setFotolar(prev => sifirla ? yeniPetler : [...prev, ...yeniPetler]);
     } catch (e) { console.error(e); }
     setLoading(false);
   };
@@ -64,7 +87,7 @@ export default function Home() {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) kediGetir();
+      if (entries[0].isIntersecting) petGetir();
     });
     if (node) observer.current.observe(node);
   }, [loading]);
@@ -94,7 +117,6 @@ export default function Home() {
     const yeniHak = oyHakki - 1;
     const yeniPuan = toplamPuan + secilenPuan;
 
-    // Arayüzü anında güncelle
     setOyHakki(yeniHak);
     setToplamPuan(yeniPuan);
     setFotolar(prev => {
@@ -104,11 +126,7 @@ export default function Home() {
     });
 
     setOylamaPaneli({ open: false, index: null });
-
-    // Veritabanına yaz
     await supabase.from('profil').update({ oy_hakki: yeniHak, toplam_puan: yeniPuan }).eq('id', user.id);
-    
-    // Küçük bir gecikmeyle sonraki pete kaydır
     setTimeout(sonrakiPet, 500);
   };
 
@@ -210,9 +228,9 @@ export default function Home() {
         </section>
       ))}
 
-      {/* LOGIN MODAL */}
+      {/* MODALLAR (Login, Oylama, Enerji) - Mevcut haliyle korundu */}
       {showLoginModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl relative text-center">
             <button onClick={() => setShowLoginModal(false)} className="absolute top-6 right-8 text-white/20 hover:text-white font-bold text-xl">×</button>
             <div className="mb-8">
@@ -224,7 +242,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* OYLAMA PANELİ */}
       {oylamaPaneli.open && user && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl">
@@ -250,7 +267,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* ENERJİ MODAL */}
       {reklamModu && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
           <div className="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center shadow-2xl relative text-black">
