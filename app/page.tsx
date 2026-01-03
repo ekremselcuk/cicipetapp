@@ -6,7 +6,6 @@ import { useSearchParams } from 'next/navigation';
 import Turnstile from 'react-turnstile';
 import Login from './login';
 
-// Ana bileşeni Suspense ile sarmalıyoruz çünkü useSearchParams kullanıyoruz
 export default function Home() {
   return (
     <Suspense fallback={<div className="bg-black h-screen w-full flex items-center justify-center text-amber-500 font-black italic uppercase">Yükleniyor...</div>}>
@@ -30,13 +29,12 @@ function HomeContent() {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const searchParams = useSearchParams();
-  const kategori = searchParams.get('kat') || 'kedi'; // Kategori yoksa kedi getir
+  const kategori = searchParams.get('kat') || 'kedi';
 
   const observer = useRef<IntersectionObserver | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Kategori değişince listeyi sıfırla ve yeni veri çek
     setFotolar([]);
     petGetir(true); 
     checkUser();
@@ -64,7 +62,6 @@ function HomeContent() {
     if (loading) return;
     setLoading(true);
     try {
-      // Kategoriye göre API URL seçimi
       let url = 'https://api.thecatapi.com/v1/images/search?limit=10';
       if (kategori === 'kopek') {
         url = 'https://api.thedogapi.com/v1/images/search?limit=10';
@@ -160,33 +157,38 @@ function HomeContent() {
   return (
     <main ref={scrollContainerRef} className="h-screen w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide select-none">
       
-      {/* ÜST BAR */}
+      {/* ÜST BAR - GÜNCELLENDİ */}
       <div className="fixed top-0 left-0 w-full z-50 p-4 flex justify-center pointer-events-none">
         <div className="w-full max-w-xl flex flex-col items-center gap-2">
           <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
             
             <div className="flex items-center gap-4 sm:gap-6">
-              <Link href="/" onClick={() => window.location.href='/'} className="flex flex-col pl-3 active:scale-95 group transition-transform">
-                <h1 className="text-lg sm:text-xl font-black text-white italic group-hover:text-amber-500 tracking-tighter transition-colors">Cici<span className="text-amber-500 group-hover:text-white">Pet</span></h1>
-                <p className="text-[6px] sm:text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5 italic">En Tatlı Yarışma 🏆</p>
+              <Link href="/" onClick={() => window.location.href='/'} className="flex flex-col pl-4 active:scale-95 group transition-transform">
+                <h1 className="text-2xl sm:text-3xl font-black text-white italic group-hover:text-amber-500 tracking-tighter transition-colors leading-none">
+                  Cici<span className="text-amber-500 group-hover:text-white">Pet</span>
+                </h1>
+                <p className="text-[7px] sm:text-[8px] font-bold text-white/40 uppercase tracking-[0.2em] mt-1 italic leading-none">En Tatlı Yarışma 🏆</p>
               </Link>
 
-              <Link href="/kategoriler" className="text-white font-black italic text-[10px] sm:text-[11px] uppercase hover:text-amber-500 transition-colors border-l border-white/10 pl-4 py-1">
+              <Link href="/kategoriler" className="text-white font-black italic text-[11px] sm:text-[12px] uppercase hover:text-amber-500 transition-colors border-l border-white/10 pl-4 py-2">
                 Kategoriler
               </Link>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 pr-2">
               <button 
                 onClick={() => user ? (window.location.href='/profil') : setShowLoginModal(true)}
-                className="bg-white/5 px-3 sm:px-4 py-2 rounded-2xl border border-white/10 hover:bg-white/20 transition-all active:scale-95 text-white font-black italic text-[10px]"
+                className="flex items-center gap-2.5 bg-white/5 hover:bg-white/20 p-2 sm:p-2.5 rounded-full border border-white/10 transition-all active:scale-90 text-white"
               >
-                🏆 {toplamPuan} CP
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 2a5 5 0 1 1 -5 5l.005 -.217a5 5 0 0 1 4.995 -4.783z" /><path d="M14 14a5 5 0 0 1 5 5v1a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-1a5 5 0 0 1 5 -5h4z" />
+                </svg>
+                {toplamPuan > 0 && <span className="text-[11px] font-black italic pr-1 tracking-tighter text-amber-500">{toplamPuan} CP</span>}
               </button>
 
               {user && (
                 <button onClick={cikisYap} className="bg-red-500/10 p-2.5 rounded-full border border-red-500/10 text-red-500 active:scale-90 transition-all">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
                 </button>
               )}
             </div>
@@ -228,7 +230,7 @@ function HomeContent() {
         </section>
       ))}
 
-      {/* MODALLAR (Login, Oylama, Enerji) - Mevcut haliyle korundu */}
+      {/* MODALLAR */}
       {showLoginModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl relative text-center">

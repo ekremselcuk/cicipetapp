@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CiciPet | En Tatlı Patileri Oyla",
+  title: "CiciPet | En Ciciyi Sen Seç",
   description: "En sevimli evcil hayvanları oyla, CiciPuan kazan ve yarışmaya katıl!",
 };
 
