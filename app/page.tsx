@@ -255,7 +255,7 @@ export default function Home() {
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
           <div className="bg-white w-full max-w-xs p-8 rounded-[3rem] text-center shadow-2xl relative text-black">
             <button onClick={() => setReklamModu(false)} className="absolute top-4 right-6 text-gray-400 font-bold text-xl">×</button>
-            <h2 className="text-2xl font-black text-amber-600 uppercase italic mb-6">Enerji Lazım!</h2>
+            <h2 className="text-2xl font-black text-amber-600 uppercase italic mb-6">Enerji1 Lazım!</h2>
             <Turnstile sitekey="0x4AAAAAACKO4jMEI3P1ys-3" onVerify={(token) => setCaptchaToken(token)} />
             <button onClick={enerjiTazele} disabled={!captchaToken} className="w-full mt-4 py-4 rounded-2xl bg-black text-white font-black uppercase italic shadow-lg active:scale-95 disabled:opacity-20 transition-all">Enerji Tazele (+5)</button>
           </div>
