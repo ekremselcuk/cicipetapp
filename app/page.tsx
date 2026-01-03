@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { supabase } from '@/lib/supabase';
-import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Turnstile from 'react-turnstile';
 import Login from './login';
@@ -35,7 +34,6 @@ function HomeContent() {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [activeScrollIndex, setActiveScrollIndex] = useState(0);
 
-  // ELEGANT TURKUAZ RENGİ: #06b6d4'ten daha ağır bir tona çektik
   const elegantTurkuaz = "#0891b2"; 
 
   const kategoriler = [
@@ -45,6 +43,31 @@ function HomeContent() {
     { id: 'hamster', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 22H4a2 2 0 0 1 0-4h12"/><path d="M13.236 18a3 3 0 0 0-2.2-5"/><path d="M16 9h.01"/><path d="M16.82 3.94a3 3 0 1 1 3.237 4.868l1.815 2.587a1.5 1.5 0 0 1-1.5 2.1l-2.872-.453a3 3 0 0 0-3.5 3"/><path d="M17 4.988a3 3 0 1 0-5.2 2.052A7 7 0 0 0 4 14.015 4 4 0 0 0 8 18"/></svg> },
     { id: 'reptile', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 12-1.5 3"/><path d="M19.63 18.81 22 20"/><path d="M6.47 8.23a1.68 1.68 0 0 1 2.44 1.93l-.64 2.08a6.76 6.76 0 0 0 10.16 7.67l.42-.27a1 1 0 1 0-2.73-4.21l-.42.27a1.76 1.76 0 0 1-2.63-1.99l.64-2.08A6.66 6.66 0 0 0 3.94 3.9l-.7.4a1 1 0 1 0 2.55 4.34z"/></svg> }
   ];
+
+  // PET GETİRME FONKSİYONU
+  const petGetir = useCallback(async (sifirla = false) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const katQuery = kategori || 'kedi';
+      let apiKategori = katQuery === 'kopek' ? 'dog' : 'cat';
+      const res = await fetch(`https://api.the${apiKategori}api.com/v1/images/search?limit=10`);
+      const data = await res.json();
+      const yeniPetler = data.map((pet: any) => ({ id: pet.id, foto_url: pet.url, liked: false }));
+      setFotolar(prev => sifirla ? yeniPetler : [...prev, ...yeniPetler]);
+    } catch (e) { console.error(e); }
+    setLoading(false);
+  }, [kategori, loading]);
+
+  // VERCEL'İN KIZDIĞI EKSİK FONKSİYON (INFINITE SCROLL)
+  const sonElemanRef = useCallback((node: any) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) petGetir();
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, petGetir]);
 
   useEffect(() => {
     setFotolar([]);
@@ -68,20 +91,6 @@ function HomeContent() {
     }
   };
 
-  const petGetir = async (sifirla = false) => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const katQuery = kategori || 'kedi';
-      let apiKategori = katQuery === 'kopek' ? 'dog' : 'cat';
-      const res = await fetch(`https://api.the${apiKategori}api.com/v1/images/search?limit=10`);
-      const data = await res.json();
-      const yeniPetler = data.map((pet: any) => ({ id: pet.id, foto_url: pet.url, liked: false }));
-      setFotolar(prev => sifirla ? yeniPetler : [...prev, ...yeniPetler]);
-    } catch (e) { console.error(e); }
-    setLoading(false);
-  };
-
   const handleScroll = (e: any) => {
     const index = Math.round(e.target.scrollTop / window.innerHeight);
     setActiveScrollIndex(index);
@@ -90,23 +99,13 @@ function HomeContent() {
   const paylas = async () => {
     const currentPet = fotolar[activeScrollIndex];
     if (!currentPet) return;
-
     const siteUrl = window.location.origin;
     const paylasimLink = `${siteUrl}/?kat=${kategori || 'kedi'}&petId=${currentPet.id}`;
-    
-    const sloganlar = [
-      "Buna bayılacaksın! 🥰 Hemen puan ver!",
-      "Gördüğüm en asil pet olabilir... ✨",
-      "Sence de çok tatlı değil mi? 😍",
-      "Puanını ver, zirveye taşıyalım! 🚀"
-    ];
-    const rastgeleSlogan = sloganlar[Math.floor(Math.random() * sloganlar.length)];
-
     if (navigator.share) {
-      try { await navigator.share({ title: 'CiciPet', text: rastgeleSlogan, url: paylasimLink }); } catch (e) {}
+      try { await navigator.share({ title: 'CiciPet', text: 'Bu tatlılığa kaç puan verirsin?', url: paylasimLink }); } catch (e) {}
     } else {
       navigator.clipboard.writeText(paylasimLink);
-      alert('Paylaşım linki kopyalandı! ✨');
+      alert('Link kopyalandı! ✨');
     }
   };
 
@@ -164,7 +163,6 @@ function HomeContent() {
           </div>
         </div>
 
-        {/* KATEGORİLER */}
         <div className="w-full max-w-xs flex justify-around items-center bg-white/5 backdrop-blur-xl p-2 rounded-full border border-white/10 shadow-2xl pointer-events-auto">
           {kategoriler.map((kat) => (
             <button key={kat.id} onClick={() => router.push(`/?kat=${kat.id}`)} className={`p-3 rounded-full transition-all active:scale-90 ${kategori === kat.id ? 'text-black scale-110 shadow-lg' : 'text-white/40 hover:text-white'}`} style={kategori === kat.id ? { backgroundColor: elegantTurkuaz } : {}}>
@@ -174,7 +172,7 @@ function HomeContent() {
         </div>
       </div>
 
-      {/* FOTOLAR */}
+      {/* FOTOLAR - ARTIK sonElemanRef TANIMLI! */}
       <div ref={scrollContainerRef} onScroll={handleScroll} className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide">
         {fotolar.map((foto, index) => (
           <section key={foto.id + index} ref={fotolar.length === index + 1 ? sonElemanRef : null} className="h-screen w-full flex items-center justify-center snap-start snap-always relative">
@@ -186,7 +184,7 @@ function HomeContent() {
         ))}
       </div>
 
-      {/* ALT BAR (PAYLAŞ ARTIK ÇALIŞIYOR) */}
+      {/* ALT BAR */}
       <div className="fixed bottom-12 left-0 w-full z-[60] flex justify-center px-4 pointer-events-none">
         <div className="bg-white/10 backdrop-blur-3xl p-3 rounded-[3rem] border border-white/10 shadow-2xl flex items-center gap-4 pointer-events-auto">
           <button onClick={() => scrollContainerRef.current?.scrollBy({ top: window.innerHeight, behavior: 'smooth' })} className="p-4 rounded-full bg-white/5 active:scale-75 transition-all border border-white/5" style={{ color: elegantTurkuaz }}>
