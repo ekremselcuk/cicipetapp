@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="bg-black h-screen w-full flex items-center justify-center text-cyan-500 font-black italic uppercase">Yükleniyor...</div>}>
+    <Suspense fallback={<div className="bg-black h-screen w-full flex items-center justify-center text-cyan-600 font-black italic uppercase">Yükleniyor...</div>}>
       <HomeContent />
     </Suspense>
   );
@@ -26,7 +26,7 @@ function HomeContent() {
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const kategori = searchParams.get('kat');
+  const kategori = searchParams.get('kat') || 'kedi';
   const elegantTurkuaz = "#0891b2"; 
 
   const observer = useRef<IntersectionObserver | null>(null);
@@ -41,12 +41,30 @@ function HomeContent() {
     { id: 'reptile', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 12-1.5 3"/><path d="M19.63 18.81 22 20"/><path d="M6.47 8.23a1.68 1.68 0 0 1 2.44 1.93l-.64 2.08a6.76 6.76 0 0 0 10.16 7.67l.42-.27a1 1 0 1 0-2.73-4.21l-.42.27a1.76 1.76 0 0 1-2.63-1.99l.64-2.08A6.66 6.66 0 0 0 3.94 3.9l-.7.4a1 1 0 1 0 2.55 4.34z"/></svg> }
   ];
 
-  // AUTH TAKİBİ
+  // PET GETİRME - DAHA STABİL
+  const petGetir = useCallback(async (sifirla = false) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const apiKategori = kategori === 'kopek' ? 'dog' : 'cat';
+      const res = await fetch(`https://api.the${apiKategori}api.com/v1/images/search?limit=10`);
+      const data = await res.json();
+      const yeniPetler = data.map((pet: any) => ({ id: pet.id, foto_url: pet.url, liked: false }));
+      setFotolar(prev => sifirla ? yeniPetler : [...prev, ...yeniPetler]);
+    } catch (e) { console.error("Pet yükleme hatası:", e); }
+    finally { setLoading(false); }
+  }, [kategori]); // Sadece kategori değişince kendini günceller
+
+  // AUTH VE İLK YÜKLEME
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       if (session?.user) fetchUserData(session.user.id);
-    });
+    };
+
+    checkSession();
+    petGetir(true); // İlk açılışta veriyi çek
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
@@ -57,7 +75,7 @@ function HomeContent() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [kategori, petGetir]); // Flicker'ı önleyen kritik bağımlılık yönetimi
 
   const fetchUserData = async (userId: string) => {
     const { data } = await supabase.from('profil').select('oy_hakki, toplam_puan').eq('id', userId).single();
@@ -79,20 +97,6 @@ function HomeContent() {
     setLoginLoading(false);
   };
 
-  const petGetir = useCallback(async (sifirla = false) => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const katQuery = kategori || 'kedi';
-      let apiKategori = katQuery === 'kopek' ? 'dog' : 'cat';
-      const res = await fetch(`https://api.the${apiKategori}api.com/v1/images/search?limit=10`);
-      const data = await res.json();
-      const yeniPetler = data.map((pet: any) => ({ id: pet.id, foto_url: pet.url, liked: false }));
-      setFotolar(prev => sifirla ? yeniPetler : [...prev, ...yeniPetler]);
-    } catch (e) { console.error(e); }
-    setLoading(false);
-  }, [kategori, loading]);
-
   const sonElemanRef = useCallback((node: any) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
@@ -102,25 +106,27 @@ function HomeContent() {
     if (node) observer.current.observe(node);
   }, [loading, petGetir]);
 
-  useEffect(() => {
-    setFotolar([]);
-    petGetir(true); 
-  }, [kategori, petGetir]);
-
   const handleScroll = (e: any) => {
     const index = Math.round(e.target.scrollTop / window.innerHeight);
-    setActiveScrollIndex(index);
+    if (index !== activeScrollIndex) setActiveScrollIndex(index);
   };
 
   const paylas = async () => {
     const currentPet = fotolar[activeScrollIndex];
     if (!currentPet) return;
-    const paylasimLink = `${window.location.origin}/?kat=${kategori || 'kedi'}&petId=${currentPet.id}`;
+    const paylasimLink = `${window.location.origin}/?kat=${kategori}&petId=${currentPet.id}`;
+    
     if (navigator.share) {
-      try { await navigator.share({ title: 'CiciPet', text: 'Bu tatlılığa kaç puan verirsin?', url: paylasimLink }); } catch (e) {}
+      try { 
+        await navigator.share({ 
+          title: 'CiciPet', 
+          text: 'Bu tatlılığa kaç puan verirsin? 😍', 
+          url: paylasimLink 
+        }); 
+      } catch (e) { console.log("Paylaşım iptal edildi."); }
     } else {
-      navigator.clipboard.writeText(paylasimLink);
-      alert('Link kopyalandı! ✨');
+      await navigator.clipboard.writeText(paylasimLink);
+      alert('Paylaşım linki panoya kopyalandı! ✨');
     }
   };
 
@@ -151,7 +157,7 @@ function HomeContent() {
       {/* ÜST BAR */}
       <div className="fixed top-0 left-0 w-full z-[60] flex flex-col items-center pt-6 pb-10 bg-gradient-to-b from-black via-black/90 to-transparent">
         <div className="w-full max-w-md flex items-center justify-between px-6 mb-4">
-          <div onClick={() => window.location.href='/'} className="flex flex-col cursor-pointer active:scale-95 transition-all">
+          <div onClick={() => router.push('/')} className="flex flex-col cursor-pointer active:scale-95 transition-all">
             <h1 className="text-2xl font-black italic tracking-tighter">
               Cici<span style={{ color: elegantTurkuaz }}>Pet</span>
             </h1>
@@ -181,14 +187,18 @@ function HomeContent() {
 
       {/* FOTOLAR */}
       <div ref={scrollContainerRef} onScroll={handleScroll} className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide">
-        {fotolar.map((foto, index) => (
+        {fotolar.length > 0 ? fotolar.map((foto, index) => (
           <section key={foto.id + index} ref={fotolar.length === index + 1 ? sonElemanRef : null} className="h-screen w-full flex items-center justify-center snap-start snap-always relative">
             <img src={foto.foto_url} className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-10" alt="" />
             <div className="relative w-full max-w-sm aspect-square px-4">
-              <img src={foto.foto_url} onDoubleClick={() => { if(!user) setShowLoginModal(true); else setOylamaPaneli({ open: true, index }); }} className="w-full h-full object-cover rounded-[3.5rem] shadow-2xl border-4 border-white/5 bg-zinc-800" alt="Pet" />
+              <img src={foto.foto_url} onDoubleClick={() => { if(!user) setShowLoginModal(true); else setOylamaPaneli({ open: true, index }); }} className="w-full h-full object-cover rounded-[3.5rem] shadow-2xl border-4 border-white/5 bg-zinc-800" alt="Pet" loading="lazy" />
             </div>
           </section>
-        ))}
+        )) : (
+          <div className="h-screen w-full flex items-center justify-center text-white/20 uppercase font-black italic tracking-widest">
+            {loading ? "Görseller Getiriliyor..." : "Pet Bulunamadı"}
+          </div>
+        )}
       </div>
 
       {/* ALT BAR */}
@@ -201,14 +211,14 @@ function HomeContent() {
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M15 6a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M8.7 10.7l6.6 -3.4" /><path d="M8.7 13.3l6.6 3.4" /></svg>
             Paylaş
           </button>
-          <button onClick={() => { if(!user) setShowLoginModal(true); else setOylamaPaneli({ open: true, index: activeScrollIndex }); }} className={`flex items-center gap-2 px-6 py-4 rounded-full transition-all active:scale-95 border font-black italic text-xs uppercase ${fotolar[activeScrollIndex]?.liked ? 'bg-green-500 border-green-400 text-white' : 'text-black shadow-lg shadow-cyan-900/20'}`} style={!fotolar[activeScrollIndex]?.liked ? { backgroundColor: elegantTurkuaz, borderColor: elegantTurkuaz } : {}}>
+          <button onClick={() => { if(!user) setShowLoginModal(true); else setOylamaPaneli({ open: true, index: activeScrollIndex }); }} className={`flex items-center gap-2 px-6 py-4 rounded-full transition-all active:scale-95 border font-black italic text-xs uppercase ${fotolar[activeScrollIndex]?.liked ? 'bg-green-600 border-green-500 text-white' : 'text-black shadow-lg shadow-cyan-900/20'}`} style={!fotolar[activeScrollIndex]?.liked ? { backgroundColor: elegantTurkuaz, borderColor: elegantTurkuaz } : {}}>
             <span className="text-xl leading-none">{fotolar[activeScrollIndex]?.liked ? '✅' : '⭐'}</span>
             {fotolar[activeScrollIndex]?.liked ? 'Bitti' : 'Puan Ver'}
           </button>
         </div>
       </div>
 
-      {/* LOGIN MODAL (GÖMÜLÜ) */}
+      {/* LOGIN MODAL */}
       {showLoginModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[4rem] shadow-2xl relative text-center">
@@ -216,21 +226,9 @@ function HomeContent() {
             <h2 className="text-2xl font-black italic mb-2">Hoş Geldin!</h2>
             <p className="text-white/40 text-sm mb-8">Puan vermek için giriş yapmalısın.</p>
             <form onSubmit={handleMagicLink} className="space-y-4">
-              <input 
-                type="email" 
-                placeholder="E-posta adresin" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-cyan-500 transition-colors"
-              />
-              <button 
-                type="submit" 
-                disabled={loginLoading}
-                className="w-full py-4 rounded-2xl font-black uppercase italic tracking-widest disabled:opacity-50"
-                style={{ backgroundColor: elegantTurkuaz, color: '#000' }}
-              >
-                {loginLoading ? 'Gönderiliyor...' : 'Giriş Yap'}
+              <input type="email" placeholder="E-posta adresin" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-cyan-500 transition-colors" />
+              <button type="submit" disabled={loginLoading} className="w-full py-4 rounded-2xl font-black uppercase italic tracking-widest disabled:opacity-50" style={{ backgroundColor: elegantTurkuaz, color: '#000' }}>
+                {loginLoading ? 'Gönderiliyor...' : 'Giriş Linki Gönder'}
               </button>
             </form>
           </div>
@@ -252,7 +250,7 @@ function HomeContent() {
                 <button key={i} onClick={() => oyVer(label)} disabled={secilenPuan === null} className="w-full py-4 rounded-3xl border border-white/10 bg-white/5 text-white font-bold tracking-tight active:scale-95 disabled:opacity-10">{label}</button>
               ))}
             </div>
-            <button onClick={() => setOylamaPaneli({ open: false, index: null })} className="w-full mt-6 text-white/20 text-xs font-bold uppercase tracking-widest">Kapat</button>
+            <button onClick={() => setOylamaPaneli({ open: false, index: null })} className="w-full mt-6 text-white/20 text-xs font-bold uppercase tracking-widest">Vazgeç</button>
           </div>
         </div>
       )}
