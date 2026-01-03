@@ -114,11 +114,18 @@ function HomeContent() {
   };
 
   const oyVer = async () => {
-    if (secilenPuan === null || !user || oyHakki === null) return;
+    if (secilenPuan === null || !user || !oyHakki || oyHakki <= 0) {
+      if (oyHakki !== null && oyHakki <= 0) alert("Enerjin bitti kral! Biraz bekle veya paylaş kazan.");
+      return;
+    }
+    
     const index = oylamaPaneli.index;
     if (index === null) return;
-    const yeniHak = oyHakki - 1;
+
+    // Eksiye düşmemesi için kontrol
+    const yeniHak = Math.max(0, oyHakki - 1);
     const yeniPuan = toplamPuan + secilenPuan;
+
     setOyHakki(yeniHak);
     setToplamPuan(yeniPuan);
     setFotolar(prev => {
@@ -126,6 +133,7 @@ function HomeContent() {
       if (kopya[index]) kopya[index].liked = true;
       return kopya;
     });
+
     setOylamaPaneli({ open: false, index: null });
     await supabase.from('profil').update({ oy_hakki: yeniHak, toplam_puan: yeniPuan }).eq('id', user.id);
     scrollContainerRef.current?.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
@@ -137,8 +145,7 @@ function HomeContent() {
       {/* ÜST BAR */}
       <div className="fixed top-0 left-0 w-full z-[60] flex flex-col items-center pt-6 pb-10 bg-gradient-to-b from-black via-black/90 to-transparent">
         <div className="w-full max-w-md flex items-center justify-between px-6 mb-4">
-          {/* REFRESH ÖZELLİĞİ EKLENDİ */}
-          <div onClick={() => window.location.href = '/'} className="flex flex-col cursor-pointer active:scale-95 transition-all">
+          <div onClick={() => window.location.reload()} className="flex flex-col cursor-pointer active:scale-95 transition-all">
             <h1 className="text-2xl font-black italic tracking-tighter">
               Cici<span style={{ color: elegantTurkuaz }}>Pet</span>
             </h1>
@@ -157,11 +164,9 @@ function HomeContent() {
           </div>
         </div>
 
-        {/* ENERJİ SAYACI VE KATEGORİLER */}
         <div className="flex flex-col items-center gap-2">
-           {/* ENERJİ SAYACI EKLENDİ */}
            {user && (
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 backdrop-blur-md animate-pulse">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 backdrop-blur-md">
                <span className="text-[10px] font-black italic text-white/60 uppercase">Enerji:</span>
                <span className="text-[11px] font-black" style={{ color: elegantTurkuaz }}>{oyHakki ?? 0}</span>
                <div className="w-2 h-2 rounded-full shadow-[0_0_8px_#0891b2]" style={{ backgroundColor: elegantTurkuaz }}></div>
@@ -213,11 +218,7 @@ function HomeContent() {
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-10 rounded-[4rem] shadow-2xl relative text-center">
             <button onClick={() => setShowLoginModal(false)} className="absolute top-8 right-8 text-white/40 font-bold text-xl">×</button>
             <h2 className="text-2xl font-black italic mb-2">Hoş Geldin!</h2>
-            <p className="text-white/40 text-sm mb-10 italic uppercase tracking-tighter">Oylama yapmak için bağlan.</p>
-            <button onClick={handleGoogleLogin} className="w-full py-5 rounded-2xl font-black uppercase italic tracking-widest flex items-center justify-center gap-3 bg-white text-black active:scale-95 transition-all">
-              <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-1 .67-2.28 1.07-3.71 1.07-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.11c-.22-.67-.35-1.39-.35-2.11s.13-1.44.35-2.11V7.05H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.95l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-              Google Bağlantısı
-            </button>
+            <button onClick={handleGoogleLogin} className="w-full py-5 rounded-2xl font-black uppercase italic tracking-widest flex items-center justify-center gap-3 bg-white text-black active:scale-95 transition-all mt-6">Google Bağlantısı</button>
           </div>
         </div>
       )}
