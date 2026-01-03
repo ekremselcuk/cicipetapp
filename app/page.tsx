@@ -30,6 +30,7 @@ function HomeContent() {
 
   const searchParams = useSearchParams();
   const kategori = searchParams.get('kat') || 'kedi';
+  const petId = searchParams.get('petId'); // Paylaşılan petin ID'si
 
   const observer = useRef<IntersectionObserver | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -38,7 +39,7 @@ function HomeContent() {
     setFotolar([]);
     petGetir(true); 
     checkUser();
-  }, [kategori]);
+  }, [kategori, petId]);
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -62,18 +63,25 @@ function HomeContent() {
     if (loading) return;
     setLoading(true);
     try {
-      let url = 'https://api.thecatapi.com/v1/images/search?limit=10';
-      if (kategori === 'kopek') {
-        url = 'https://api.thedogapi.com/v1/images/search?limit=10';
-      }
-      
+      let url = `https://api.the${kategori === 'kopek' ? 'dog' : 'cat'}api.com/v1/images/search?limit=10`;
       const res = await fetch(url);
       const data = await res.json();
-      const yeniPetler = data.map((pet: any) => ({
+      
+      let yeniPetler = data.map((pet: any) => ({
         id: pet.id,
         foto_url: pet.url,
         liked: false
       }));
+
+      // EĞER PAYLAŞILAN BİR PET VARSA ONU EN BAŞA EKLE
+      if (sifirla && petId) {
+        const specRes = await fetch(`https://api.the${kategori === 'kopek' ? 'dog' : 'cat'}api.com/v1/images/${petId}`);
+        if (specRes.ok) {
+          const specData = await specRes.json();
+          const specPet = { id: specData.id, foto_url: specData.url, liked: false };
+          yeniPetler = [specPet, ...yeniPetler.filter(p => p.id !== petId)];
+        }
+      }
 
       setFotolar(prev => sifirla ? yeniPetler : [...prev, ...yeniPetler]);
     } catch (e) { console.error(e); }
@@ -127,12 +135,22 @@ function HomeContent() {
     setTimeout(sonrakiPet, 500);
   };
 
-  const paylas = async (url: string) => {
+  // PAYLAŞ FONKSİYONU GÜNCELLENDİ: ARTIK SİTE LİNKİ GİDİYOR
+  const paylas = async (id: string) => {
+    const siteUrl = window.location.origin;
+    const paylasimLink = `${siteUrl}/?kat=${kategori}&petId=${id}`;
+
     if (navigator.share) {
-      try { await navigator.share({ title: 'CiciPet', text: 'Bu tatlı pete bir baksana! 😍', url: url }); } catch (e) {}
+      try { 
+        await navigator.share({ 
+          title: 'CiciPet - En Tatlı Yarışma 🏆', 
+          text: 'Bu tatlı pete bir baksana, sence kaç puan? 😍', 
+          url: paylasimLink 
+        }); 
+      } catch (e) {}
     } else {
-      navigator.clipboard.writeText(url);
-      alert('Link kopyalandı! 🐾');
+      navigator.clipboard.writeText(paylasimLink);
+      alert('Yarışma linki kopyalandı! 🐾');
     }
   };
 
@@ -157,7 +175,7 @@ function HomeContent() {
   return (
     <main ref={scrollContainerRef} className="h-screen w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide select-none">
       
-      {/* ÜST BAR - GÜNCELLENDİ */}
+      {/* ÜST BAR */}
       <div className="fixed top-0 left-0 w-full z-50 p-4 flex justify-center pointer-events-none">
         <div className="w-full max-w-xl flex flex-col items-center gap-2">
           <div className="w-full flex items-center justify-between bg-white/10 backdrop-blur-2xl border border-white/10 p-3 rounded-[2.5rem] shadow-2xl pointer-events-auto">
@@ -214,7 +232,8 @@ function HomeContent() {
             />
             
             <div className="absolute right-4 bottom-24 flex flex-col items-center gap-6">
-              <button onClick={() => paylas(foto.foto_url)} className="p-4 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white active:scale-90 shadow-xl transition-all">
+              {/* PAYLAŞ BUTONU PARAMETRESİ URL DEĞİL ID OLDU */}
+              <button onClick={() => paylas(foto.id)} className="p-4 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white active:scale-90 shadow-xl transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0-10.628a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zm0 10.628a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" /></svg>
               </button>
               
@@ -230,7 +249,7 @@ function HomeContent() {
         </section>
       ))}
 
-      {/* MODALLAR */}
+      {/* MODALLAR (Login, Oylama, Enerji) */}
       {showLoginModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[3.5rem] shadow-2xl relative text-center">
