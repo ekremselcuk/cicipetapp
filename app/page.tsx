@@ -18,7 +18,6 @@ function HomeContent() {
   const [oyHakki, setOyHakki] = useState<number | null>(null); 
   const [toplamPuan, setToplamPuan] = useState(0);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  
   const [oylamaPaneli, setOylamaPaneli] = useState<{ open: boolean, index: number | null }>({ open: false, index: null });
   const [secilenPuan, setSecilenPuan] = useState<number | null>(null); 
 
@@ -31,7 +30,6 @@ function HomeContent() {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [activeScrollIndex, setActiveScrollIndex] = useState(0);
 
-  // PAYLAŞIM MESAJLARI (KARIŞIK)
   const paylasimMesajlari = [
     "Bu tatlılığa kaç puan verirsin? 😍",
     "Şu karizmaya bak, 10 üzerinden kaç? 😎",
@@ -39,6 +37,14 @@ function HomeContent() {
     "Buna 'oy vermeyen' taş olur! 🤪 Kaç puan veriyoruz?",
     "Ayrıl da gel! Şu güzelliğe bir puan patlat... 🔥",
     "Gördüğüm en tatlı şey olabilir, sence? 🥰"
+  ];
+
+  const kategoriler = [
+    { id: 'kedi', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/><path d="M8 14v.5"/><path d="M16 14v.5"/><path d="M11.25 16.25h1.5L12 17l-.75-.75Z"/></svg> },
+    { id: 'kopek', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11.25 16.25h1.5L12 17z"/><path d="M16 14v.5"/><path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444a11.702 11.702 0 0 0-.493-3.309"/><path d="M8 14v.5"/><path d="M8.5 8.5c-.384 1.05-1.083 2.028-2.344 2.5-1.931.722-3.576-.297-3.656-1-.113-.994 1.177-6.53 4-7 1.923-.321 3.651.845 3.651 2.235A7.497 7.497 0 0 1 14 5.277c0-1.39 1.844-2.598 3.767-2.277 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.855-1.45-2.239-2.5"/></svg> },
+    { id: 'bird', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 7h.01"/><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"/><path d="m20 7 2 .5-2 .5"/><path d="M10 18v3"/><path d="M14 17.75V21"/><path d="M7 18a6 6 0 0 0 3.84-10.61"/></svg> },
+    { id: 'hamster', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 22H4a2 2 0 0 1 0-4h12"/><path d="M13.236 18a3 3 0 0 0-2.2-5"/><path d="M16 9h.01"/><path d="M16.82 3.94a3 3 0 1 1 3.237 4.868l1.815 2.587a1.5 1.5 0 0 1-1.5 2.1l-2.872-.453a3 3 0 0 0-3.5 3"/><path d="M17 4.988a3 3 0 1 0-5.2 2.052A7 7 0 0 0 4 14.015 4 4 0 0 0 8 18"/></svg> },
+    { id: 'reptile', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 12-1.5 3"/><path d="M19.63 18.81 22 20"/><path d="M6.47 8.23a1.68 1.68 0 0 1 2.44 1.93l-.64 2.08a6.76 6.76 0 0 0 10.16 7.67l.42-.27a1 1 0 1 0-2.73-4.21l-.42.27a1.76 1.76 0 0 1-2.63-1.99l.64-2.08A6.66 6.66 0 0 0 3.94 3.9l-.7.4a1 1 0 1 0 2.55 4.34z"/></svg> }
   ];
 
   const handleGoogleLogin = async () => {
@@ -83,44 +89,14 @@ function HomeContent() {
   const paylas = async () => {
     const currentPet = fotolar[activeScrollIndex];
     if (!currentPet) return;
-    
-    // Rastgele mesaj seçimi
     const rastgeleMesaj = paylasimMesajlari[Math.floor(Math.random() * paylasimMesajlari.length)];
     const paylasimLink = `${window.location.origin}/?kat=${kategori}&petId=${currentPet.id}`;
-    
     if (navigator.share) {
-      try { 
-        await navigator.share({ 
-          title: 'CiciPet', 
-          text: rastgeleMesaj, 
-          url: paylasimLink 
-        }); 
-      } catch (e) { console.log("Paylaşım iptal."); }
+      try { await navigator.share({ title: 'CiciPet', text: rastgeleMesaj, url: paylasimLink }); } catch (e) {}
     } else {
       await navigator.clipboard.writeText(`${rastgeleMesaj} ${paylasimLink}`);
-      alert('Mesaj ve link panoya kopyalandı! ✨');
+      alert('Kopyalandı! ✨');
     }
-  };
-
-  const oyVer = async (etiket: string) => {
-    if (secilenPuan === null || !user || oyHakki === null) return;
-    const index = oylamaPaneli.index;
-    if (index === null) return;
-
-    const yeniHak = oyHakki - 1;
-    const yeniPuan = toplamPuan + secilenPuan;
-
-    setOyHakki(yeniHak);
-    setToplamPuan(yeniPuan);
-    setFotolar(prev => {
-      const kopya = [...prev];
-      if (kopya[index]) kopya[index].liked = true;
-      return kopya;
-    });
-
-    setOylamaPaneli({ open: false, index: null });
-    await supabase.from('profil').update({ oy_hakki: yeniHak, toplam_puan: yeniPuan }).eq('id', user.id);
-    if (scrollContainerRef.current) scrollContainerRef.current.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
   };
 
   const sonElemanRef = useCallback((node: any) => {
@@ -137,6 +113,24 @@ function HomeContent() {
     if (index !== activeScrollIndex) setActiveScrollIndex(index);
   };
 
+  const oyVer = async () => {
+    if (secilenPuan === null || !user || oyHakki === null) return;
+    const index = oylamaPaneli.index;
+    if (index === null) return;
+    const yeniHak = oyHakki - 1;
+    const yeniPuan = toplamPuan + secilenPuan;
+    setOyHakki(yeniHak);
+    setToplamPuan(yeniPuan);
+    setFotolar(prev => {
+      const kopya = [...prev];
+      if (kopya[index]) kopya[index].liked = true;
+      return kopya;
+    });
+    setOylamaPaneli({ open: false, index: null });
+    await supabase.from('profil').update({ oy_hakki: yeniHak, toplam_puan: yeniPuan }).eq('id', user.id);
+    scrollContainerRef.current?.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+  };
+
   return (
     <main className="h-screen w-full bg-black overflow-hidden relative select-none text-white font-sans">
       
@@ -147,6 +141,7 @@ function HomeContent() {
             <h1 className="text-2xl font-black italic tracking-tighter">
               Cici<span style={{ color: elegantTurkuaz }}>Pet</span>
             </h1>
+            <p className="text-[8px] font-bold text-white/40 uppercase tracking-[0.2em] italic">En Tatlı Yarışma 🏆</p>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => !user && setShowLoginModal(true)} className="flex items-center gap-2 bg-white/5 p-2.5 rounded-full border border-white/10">
@@ -162,10 +157,9 @@ function HomeContent() {
         </div>
 
         <div className="w-full max-w-xs flex justify-around items-center bg-white/5 backdrop-blur-xl p-2 rounded-full border border-white/10 shadow-2xl">
-          {['kedi', 'kopek', 'bird', 'hamster', 'reptile'].map((id) => (
-            <button key={id} onClick={() => router.push(`/?kat=${id}`)} className={`p-3 rounded-full transition-all active:scale-90 ${kategori === id ? 'text-black' : 'text-white/40 hover:text-white'}`} style={kategori === id ? { backgroundColor: elegantTurkuaz } : {}}>
-               {/* İkonlar buraya gelecek, önceki koddan devam... */}
-               ✨
+          {kategoriler.map((kat) => (
+            <button key={kat.id} onClick={() => router.push(`/?kat=${kat.id}`)} className={`p-3 rounded-full transition-all active:scale-90 ${kategori === kat.id ? 'text-black scale-110 shadow-lg' : 'text-white/40 hover:text-white'}`} style={kategori === kat.id ? { backgroundColor: elegantTurkuaz } : {}}>
+              {kat.icon}
             </button>
           ))}
         </div>
@@ -183,38 +177,39 @@ function HomeContent() {
         ))}
       </div>
 
-      {/* ALT BAR (PAYLAŞ BURADA) */}
+      {/* ALT BAR (SOLDAKİ OK VE PAYLAŞ BUTONU GERİ GELDİ) */}
       <div className="fixed bottom-12 left-0 w-full z-[60] flex justify-center px-4 pointer-events-none">
         <div className="bg-white/10 backdrop-blur-3xl p-3 rounded-[3rem] border border-white/10 shadow-2xl flex items-center gap-4 pointer-events-auto">
+          <button onClick={() => scrollContainerRef.current?.scrollBy({ top: window.innerHeight, behavior: 'smooth' })} className="p-4 rounded-full bg-white/5 active:scale-75 transition-all border border-white/5" style={{ color: elegantTurkuaz }}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6"><path d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" /></svg>
+          </button>
           <button onClick={paylas} className="flex items-center gap-2 px-6 py-4 rounded-full bg-white/5 text-white active:scale-90 transition-all border border-white/5 font-black italic text-xs uppercase tracking-widest">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M15 6a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M8.7 10.7l6.6 -3.4" /><path d="M8.7 13.3l6.6 3.4" /></svg>
             Paylaş
           </button>
-          <button onClick={() => { if(!user) setShowLoginModal(true); else setOylamaPaneli({ open: true, index: activeScrollIndex }); }} className={`flex items-center gap-2 px-6 py-4 rounded-full transition-all active:scale-95 border font-black italic text-xs uppercase ${fotolar[activeScrollIndex]?.liked ? 'bg-green-600 border-green-500 text-white' : 'text-black shadow-lg'}`} style={!fotolar[activeScrollIndex]?.liked ? { backgroundColor: elegantTurkuaz, borderColor: elegantTurkuaz } : {}}>
+          <button onClick={() => { if(!user) setShowLoginModal(true); else setOylamaPaneli({ open: true, index: activeScrollIndex }); }} className={`flex items-center gap-2 px-6 py-4 rounded-full transition-all active:scale-95 border font-black italic text-xs uppercase ${fotolar[activeScrollIndex]?.liked ? 'bg-green-600 border-green-500 text-white' : 'text-black shadow-lg shadow-cyan-900/20'}`} style={!fotolar[activeScrollIndex]?.liked ? { backgroundColor: elegantTurkuaz, borderColor: elegantTurkuaz } : {}}>
             <span className="text-xl leading-none">{fotolar[activeScrollIndex]?.liked ? '✅' : '⭐'}</span>
             {fotolar[activeScrollIndex]?.liked ? 'Bitti' : 'Puan Ver'}
           </button>
         </div>
       </div>
 
-      {/* LOGIN MODAL (GOOGLE ONLY) */}
+      {/* GOOGLE LOGIN MODAL */}
       {showLoginModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-10 rounded-[4rem] shadow-2xl relative text-center">
             <button onClick={() => setShowLoginModal(false)} className="absolute top-8 right-8 text-white/40 font-bold text-xl">×</button>
             <h2 className="text-2xl font-black italic mb-2">Hoş Geldin!</h2>
-            <p className="text-white/40 text-sm mb-10 italic">Oylama yapmak için tek tıkla bağlan.</p>
-            <button 
-              onClick={handleGoogleLogin}
-              className="w-full py-5 rounded-2xl font-black uppercase italic tracking-widest flex items-center justify-center gap-3 bg-white text-black active:scale-95 transition-all"
-            >
-              Google İle Bağlan
+            <p className="text-white/40 text-sm mb-10 italic uppercase tracking-tighter">Oylama yapmak için bağlan.</p>
+            <button onClick={handleGoogleLogin} className="w-full py-5 rounded-2xl font-black uppercase italic tracking-widest flex items-center justify-center gap-3 bg-white text-black active:scale-95 transition-all">
+              <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-1 .67-2.28 1.07-3.71 1.07-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.11c-.22-.67-.35-1.39-.35-2.11s.13-1.44.35-2.11V7.05H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.95l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Google Bağlantısı
             </button>
           </div>
         </div>
       )}
 
-      {/* OYLAMA PANELİ (OPSİYONEL EKLENTİ) */}
+      {/* OYLAMA PANELİ */}
       {oylamaPaneli.open && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[4rem] shadow-2xl">
@@ -226,10 +221,9 @@ function HomeContent() {
             </div>
             <div className="grid grid-cols-1 gap-3">
               {['😎 Karizmatik', '🥰 Çok Tatlı', '🎀 Çok Güzel', '🤪 Çok Komik', '👹 Çirkin'].map((label, i) => (
-                <button key={i} onClick={() => oyVer(label)} disabled={secilenPuan === null} className="w-full py-4 rounded-3xl border border-white/10 bg-white/5 text-white font-bold tracking-tight active:scale-95 disabled:opacity-10">{label}</button>
+                <button key={i} onClick={oyVer} disabled={secilenPuan === null} className="w-full py-4 rounded-3xl border border-white/10 bg-white/5 text-white font-bold tracking-tight active:scale-95 disabled:opacity-10">{label}</button>
               ))}
             </div>
-            <button onClick={() => setOylamaPaneli({ open: false, index: null })} className="w-full mt-6 text-white/20 text-xs font-bold uppercase tracking-widest">Vazgeç</button>
           </div>
         </div>
       )}
