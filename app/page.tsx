@@ -114,18 +114,14 @@ function HomeContent() {
   };
 
   const oyVer = async () => {
-    if (secilenPuan === null || !user || !oyHakki || oyHakki <= 0) {
-      if (oyHakki !== null && oyHakki <= 0) alert("Enerjin bitti kral! Biraz bekle veya paylaş kazan.");
+    if (secilenPuan === null || !user || oyHakki === null || oyHakki <= 0) {
+      if (oyHakki !== null && oyHakki <= 0) alert("Enerjin bitti kral! Biraz bekle.");
       return;
     }
-    
     const index = oylamaPaneli.index;
     if (index === null) return;
-
-    // Eksiye düşmemesi için kontrol
     const yeniHak = Math.max(0, oyHakki - 1);
     const yeniPuan = toplamPuan + secilenPuan;
-
     setOyHakki(yeniHak);
     setToplamPuan(yeniPuan);
     setFotolar(prev => {
@@ -133,7 +129,6 @@ function HomeContent() {
       if (kopya[index]) kopya[index].liked = true;
       return kopya;
     });
-
     setOylamaPaneli({ open: false, index: null });
     await supabase.from('profil').update({ oy_hakki: yeniHak, toplam_puan: yeniPuan }).eq('id', user.id);
     scrollContainerRef.current?.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
@@ -144,7 +139,7 @@ function HomeContent() {
       
       {/* ÜST BAR */}
       <div className="fixed top-0 left-0 w-full z-[60] flex flex-col items-center pt-6 pb-10 bg-gradient-to-b from-black via-black/90 to-transparent">
-        <div className="w-full max-w-md flex items-center justify-between px-6 mb-4">
+        <div className="w-full max-md flex items-center justify-between px-6 mb-4">
           <div onClick={() => window.location.reload()} className="flex flex-col cursor-pointer active:scale-95 transition-all">
             <h1 className="text-2xl font-black italic tracking-tighter">
               Cici<span style={{ color: elegantTurkuaz }}>Pet</span>
@@ -212,7 +207,7 @@ function HomeContent() {
         </div>
       </div>
 
-      {/* MODALLAR */}
+      {/* LOGIN MODAL */}
       {showLoginModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-10 rounded-[4rem] shadow-2xl relative text-center">
@@ -223,6 +218,7 @@ function HomeContent() {
         </div>
       )}
 
+      {/* OYLAMA PANELİ - KAPAT BUTONU EKLENDİ */}
       {oylamaPaneli.open && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[4rem] shadow-2xl">
@@ -237,6 +233,14 @@ function HomeContent() {
                 <button key={i} onClick={oyVer} disabled={secilenPuan === null} className="w-full py-4 rounded-3xl border border-white/10 bg-white/5 text-white font-bold tracking-tight active:scale-95 disabled:opacity-10">{label}</button>
               ))}
             </div>
+            {/* YENİ KAPAT BUTONU */}
+            <button 
+              onClick={() => { setOylamaPaneli({ open: false, index: null }); setSecilenPuan(null); }} 
+              className="w-full mt-6 py-2 text-sm font-black italic uppercase tracking-[0.2em] transition-all active:scale-90"
+              style={{ color: elegantTurkuaz }}
+            >
+              [ Kapat ]
+            </button>
           </div>
         </div>
       )}
