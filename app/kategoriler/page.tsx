@@ -3,44 +3,54 @@ import React from 'react';
 import Link from 'next/link';
 
 const KATEGORILER = [
-  { id: 'kedi', ad: 'Kediler', ikon: '🐱', renk: 'from-orange-400 to-amber-600' },
-  { id: 'kopek', ad: 'Köpekler', ikon: '🐶', renk: 'from-blue-400 to-indigo-600' },
-  { id: 'kus', ad: 'Kuşlar', ikon: '🦜', renk: 'from-green-400 to-emerald-600' },
-  { id: 'egzotik', ad: 'Egzotik', ikon: '🦎', renk: 'from-purple-400 to-pink-600' },
+  { id: 'kedi', ad: 'Kedi', ikon: '🐱', renk: 'from-orange-500 to-amber-600' },
+  { id: 'kopek', ad: 'Köpek', ikon: '🐶', renk: 'from-blue-500 to-indigo-600' },
+  { id: 'kus', ad: 'Kuş', ikon: '🦜', renk: 'from-emerald-400 to-teal-600' },
+  { id: 'diger', ad: 'Diğer', ikon: '🐾', renk: 'from-purple-500 to-pink-600' },
 ];
 
 export default function KategorilerPage() {
   return (
-    <main className="min-h-screen bg-black text-white p-6 pt-24">
-      {/* ÜST BAR */}
+    <main className="min-h-screen bg-black text-white p-4 pt-20">
+      {/* GERİ DÖN BUTONU */}
       <div className="fixed top-0 left-0 w-full z-50 p-4 flex justify-start">
-        <Link href="/" className="bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl text-[10px] font-black text-amber-500 uppercase italic active:scale-95 transition-all">
-          ← Geri Dön
+        <Link href="/" className="bg-white/5 backdrop-blur-xl border border-white/10 px-5 py-2.5 rounded-2xl text-[11px] font-black text-amber-500 uppercase italic active:scale-90 transition-all shadow-xl">
+          ← GERİ
         </Link>
       </div>
 
-      <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-black italic uppercase tracking-tighter mb-2">Kategoriler</h1>
-        <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-8 italic">Favori türünü seç ve oylamaya başla</p>
+      <div className="max-w-md mx-auto">
+        <div className="mb-10 pl-2">
+          <h1 className="text-5xl font-black italic uppercase tracking-tighter leading-none">
+            FAVORİ <span className="text-amber-500 text-2xl block mt-1">SEÇİMİNİ YAP</span>
+          </h1>
+        </div>
 
-        <div className="grid grid-cols-1 gap-4">
+        {/* 2x2 IZGARA YAPISI */}
+        <div className="grid grid-cols-2 gap-4">
           {KATEGORILER.map((kat) => (
             <Link 
               key={kat.id} 
               href={`/?kat=${kat.id}`}
-              className={`relative overflow-hidden group p-8 rounded-[2.5rem] bg-gradient-to-br ${kat.renk} transition-all duration-300 active:scale-95 shadow-2xl`}
+              className={`relative overflow-hidden aspect-square flex flex-col items-center justify-center rounded-[3rem] bg-gradient-to-br ${kat.renk} transition-all duration-300 active:scale-95 shadow-[0_20px_40px_rgba(0,0,0,0.4)] group border-t border-white/30`}
             >
-              <div className="relative z-10 flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-black italic uppercase tracking-tighter text-white">{kat.ad}</h2>
-                  <p className="text-white/20 text-[10px] font-bold uppercase mt-1 italic">Hemen Keşfet →</p>
-                </div>
-                <span className="text-5xl group-hover:scale-110 transition-transform duration-500">{kat.ikon}</span>
-              </div>
-              {/* Dekoratif Işık Etkisi */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-[50px] -mr-16 -mt-16 rounded-full"></div>
+              <span className="text-6xl mb-3 group-hover:scale-110 transition-transform duration-500 drop-shadow-lg">
+                {kat.ikon}
+              </span>
+              <h2 className="text-lg font-black italic uppercase tracking-tighter text-white">
+                {kat.ad}
+              </h2>
+              
+              {/* Parlama Efekti */}
+              <div className="absolute -top-10 -left-10 w-32 h-32 bg-white/10 blur-3xl rounded-full"></div>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-12 p-6 rounded-[2.5rem] bg-white/5 border border-white/10 text-center">
+          <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] italic">
+            Hangi patiye puan vermek istiyorsan onu seç ve yarışmaya başla!
+          </p>
         </div>
       </div>
     </main>
