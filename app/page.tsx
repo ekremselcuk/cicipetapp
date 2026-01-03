@@ -78,7 +78,6 @@ function HomeContent() {
         if (specRes.ok) {
           const specData = await specRes.json();
           const specPet = { id: specData.id, foto_url: specData.url, liked: false };
-          // TypeScript hatası için (p: any) eklendi
           yeniPetler = [specPet, ...yeniPetler.filter((p: any) => p.id !== petId)];
         }
       }
@@ -139,11 +138,23 @@ function HomeContent() {
     const siteUrl = window.location.origin;
     const paylasimLink = `${siteUrl}/?kat=${kategori}&petId=${id}`;
 
+    const sloganlar = [
+      "Günün en tatlı şeyiyle tanışmaya hazır mısın? 🥰 Puanını ver, zirveye taşıyalım! 🚀🐾",
+      "Bu tatlılık gerçek olamaz! 😍 Sence 5 puanı hak etmiyor mu? Hemen oyla! 🏆",
+      "Hala buna puan vermeyenler varmış...🥺 Bu masumiyete kaç puan verirsin? ✨",
+      "Gördüğüm en karizmatik pet olabilir! 😎 Sence de öyle mi? Oyla! 🔥",
+      "Şu bakışlara bir puan ver de keyfimiz yerine gelsin! 🎀🐾",
+      "Telefonun ekranını ısırasım geldi! 🥰 Acil puanına ihtiyacımız var! 🚑",
+      "Dünyanın en tatlı yarışmasında bu pet oylanıyor! Katılsana! 🌍🐾"
+    ];
+
+    const rastgeleSlogan = sloganlar[Math.floor(Math.random() * sloganlar.length)];
+
     if (navigator.share) {
       try { 
         await navigator.share({ 
           title: 'CiciPet - En Tatlı Yarışma 🏆', 
-          text: 'Bu tatlı pete bir baksana, sence kaç puan? 😍', 
+          text: rastgeleSlogan, 
           url: paylasimLink 
         }); 
       } catch (e) {}
