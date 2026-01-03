@@ -137,7 +137,8 @@ function HomeContent() {
       {/* ÜST BAR */}
       <div className="fixed top-0 left-0 w-full z-[60] flex flex-col items-center pt-6 pb-10 bg-gradient-to-b from-black via-black/90 to-transparent">
         <div className="w-full max-w-md flex items-center justify-between px-6 mb-4">
-          <div onClick={() => router.push('/')} className="flex flex-col cursor-pointer active:scale-95 transition-all">
+          {/* REFRESH ÖZELLİĞİ EKLENDİ */}
+          <div onClick={() => window.location.href = '/'} className="flex flex-col cursor-pointer active:scale-95 transition-all">
             <h1 className="text-2xl font-black italic tracking-tighter">
               Cici<span style={{ color: elegantTurkuaz }}>Pet</span>
             </h1>
@@ -156,12 +157,24 @@ function HomeContent() {
           </div>
         </div>
 
-        <div className="w-full max-w-xs flex justify-around items-center bg-white/5 backdrop-blur-xl p-2 rounded-full border border-white/10 shadow-2xl">
-          {kategoriler.map((kat) => (
-            <button key={kat.id} onClick={() => router.push(`/?kat=${kat.id}`)} className={`p-3 rounded-full transition-all active:scale-90 ${kategori === kat.id ? 'text-black scale-110 shadow-lg' : 'text-white/40 hover:text-white'}`} style={kategori === kat.id ? { backgroundColor: elegantTurkuaz } : {}}>
-              {kat.icon}
-            </button>
-          ))}
+        {/* ENERJİ SAYACI VE KATEGORİLER */}
+        <div className="flex flex-col items-center gap-2">
+           {/* ENERJİ SAYACI EKLENDİ */}
+           {user && (
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/10 backdrop-blur-md animate-pulse">
+               <span className="text-[10px] font-black italic text-white/60 uppercase">Enerji:</span>
+               <span className="text-[11px] font-black" style={{ color: elegantTurkuaz }}>{oyHakki ?? 0}</span>
+               <div className="w-2 h-2 rounded-full shadow-[0_0_8px_#0891b2]" style={{ backgroundColor: elegantTurkuaz }}></div>
+            </div>
+           )}
+          
+          <div className="w-full max-w-xs flex justify-around items-center bg-white/5 backdrop-blur-xl p-2 rounded-full border border-white/10 shadow-2xl">
+            {kategoriler.map((kat) => (
+              <button key={kat.id} onClick={() => router.push(`/?kat=${kat.id}`)} className={`p-3 rounded-full transition-all active:scale-90 ${kategori === kat.id ? 'text-black scale-110 shadow-lg' : 'text-white/40 hover:text-white'}`} style={kategori === kat.id ? { backgroundColor: elegantTurkuaz } : {}}>
+                {kat.icon}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -177,7 +190,7 @@ function HomeContent() {
         ))}
       </div>
 
-      {/* ALT BAR (SOLDAKİ OK VE PAYLAŞ BUTONU GERİ GELDİ) */}
+      {/* ALT BAR */}
       <div className="fixed bottom-12 left-0 w-full z-[60] flex justify-center px-4 pointer-events-none">
         <div className="bg-white/10 backdrop-blur-3xl p-3 rounded-[3rem] border border-white/10 shadow-2xl flex items-center gap-4 pointer-events-auto">
           <button onClick={() => scrollContainerRef.current?.scrollBy({ top: window.innerHeight, behavior: 'smooth' })} className="p-4 rounded-full bg-white/5 active:scale-75 transition-all border border-white/5" style={{ color: elegantTurkuaz }}>
@@ -194,7 +207,7 @@ function HomeContent() {
         </div>
       </div>
 
-      {/* GOOGLE LOGIN MODAL */}
+      {/* MODALLAR */}
       {showLoginModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-10 rounded-[4rem] shadow-2xl relative text-center">
@@ -209,7 +222,6 @@ function HomeContent() {
         </div>
       )}
 
-      {/* OYLAMA PANELİ */}
       {oylamaPaneli.open && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl">
           <div className="bg-zinc-900 border border-white/10 w-full max-w-sm p-8 rounded-[4rem] shadow-2xl">
